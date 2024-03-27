@@ -1,11 +1,11 @@
 export interface CasillaResult {
+  idCasillaPREP: number;
   distrito: string;
   municipio: string;
   seccion: number;
   casilla: string;
   listaNominal: number;
   boletas: number;
-  boletasSobrantes: number;
   votos: NodoVotos[];
   contabiliza: boolean;
   urna_electronica: boolean;
