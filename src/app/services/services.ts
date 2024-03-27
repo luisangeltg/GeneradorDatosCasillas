@@ -1,0 +1,41 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
+import { CasillaInterface, CasillasResponse, CatdResponse, PartidoInterface, PartidosResponse } from './interfaces';
+import { AppSettings } from '../app.settings';
+
+@Injectable({ providedIn: 'root' })
+export class ServicesClass {
+
+  constructor(private http: HttpClient) { }
+
+  getCasillas(): Observable<CasillasResponse> {
+    return this.http.get<CasillasResponse>(`${AppSettings.URL_BASE}/casillas.json`);
+  }
+
+  getCasillasByCatd(CATD: string): Observable<CasillasResponse> {
+    return this.http.get<CasillasResponse>(`${AppSettings.URL_BASE}/casillas.json`).pipe(
+      map((response) => {
+        const casillas = response.CasillasResponse.filter((casilla) => {
+          return (
+            (casilla.CATD == CATD)
+          )
+        });
+        return { CasillasResponse: casillas }
+      }),
+      catchError((error) => {
+        return of({CasillasResponse: []})
+      })
+    );
+  }
+
+  getCATD(): Observable<CatdResponse> {
+    return this.http.get<CatdResponse>(`${AppSettings.URL_BASE}/catd.json`)
+  }
+
+  getPartidos(): Observable<PartidosResponse> {
+    return this.http.get<PartidosResponse>(`${AppSettings.URL_BASE}/partidos.json`);
+  }
+}

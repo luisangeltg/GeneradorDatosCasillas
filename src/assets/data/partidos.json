@@ -1,0 +1,79 @@
+{
+  "PartidosResponse": [
+    {
+      "idPartido": 1,
+      "partido": "Partido Acción Nacional",
+      "siglasPartido": "PAN",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 2,
+      "partido": "Partido Revolucionario Institucional",
+      "siglasPartido": "PRI",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 3,
+      "partido": "Partido de la Revolución Democrática",
+      "siglasPartido": "PRD",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 5,
+      "partido": "Movimiento Ciudadano",
+      "siglasPartido": "MC",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 29,
+      "partido": "Va por Tamaulipas",
+      "siglasPartido": "PAN_PRI_PRD",
+      "coalicion": true,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 30,
+      "partido": "PAN_PRI",
+      "siglasPartido": "PAN_PRI",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 31,
+      "partido": "PAN_PRD",
+      "siglasPartido": "PAN_PRD",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 32,
+      "partido": "PRI_PRD",
+      "siglasPartido": "PRI_PRD",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 33,
+      "partido": "Juntos Hacemos Historia en Tamaulipas",
+      "siglasPartido": "Juntos Hacemos Historia en Tamaulipas",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    }
+  ]
+}

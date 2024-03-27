@@ -1,0 +1,26 @@
+{
+  "CatdResponse": [
+    { "ID": "01", "CATD": "01 Nuevo Laredo" },
+    { "ID": "02", "CATD": "02 Nuevo Laredo" },
+    { "ID": "03", "CATD": "03 Nuevo Laredo" },
+    { "ID": "04", "CATD": "04 Reynosa" },
+    { "ID": "05", "CATD": "05 Reynosa" },
+    { "ID": "06", "CATD": "06 Reynosa" },
+    { "ID": "07", "CATD": "07 Reynosa" },
+    { "ID": "08", "CATD": "08 Rio Bravo" },
+    { "ID": "09", "CATD": "09 Valle Hermoso" },
+    { "ID": "10", "CATD": "10 Matamoros" },
+    { "ID": "11", "CATD": "11 Matamoros" },
+    { "ID": "12", "CATD": "12 Matamoros" },
+    { "ID": "13", "CATD": "13 San Fernando" },
+    { "ID": "14", "CATD": "14 Victoria" },
+    { "ID": "15", "CATD": "15 Victoria" },
+    { "ID": "16", "CATD": "16 Xicoténcatl" },
+    { "ID": "17", "CATD": "17 El Mante" },
+    { "ID": "18", "CATD": "18 Altamira" },
+    { "ID": "19", "CATD": "19 Miramar" },
+    { "ID": "20", "CATD": "20 Ciudad Madero" },
+    { "ID": "21", "CATD": "21 Tampico" },
+    { "ID": "22", "CATD": "22 Tampico" }
+  ]
+}

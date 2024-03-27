@@ -1,0 +1,79 @@
+export interface CasillaResult {
+  distrito: string;
+  municipio: string;
+  seccion: number;
+  casilla: string;
+  listaNominal: number;
+  boletas: number;
+  boletasSobrantes: number;
+  votos: NodoVotos[];
+  contabiliza: boolean;
+  urna_electronica: boolean;
+}
+
+export interface NodoVotos {
+  nombre: string;
+  votos: number;
+}
+
+export interface CasillasResponse {
+  CasillasResponse: CasillaInterface[]
+}
+
+export interface PartidosResponse {
+  PartidosResponse: PartidoInterface[]
+}
+
+export interface CatdResponse {
+  CatdResponse: CatdInterface[]
+}
+
+
+export interface PartidoInterface {
+  idPartido:         number;
+  partido:           string;
+  siglasPartido:     string;
+  coalicion:         boolean;
+  independiente:     boolean;
+  activo:            boolean;
+  idPartidoDepende?: number;
+}
+
+export interface CasillaInterface {
+  idCasillaPREP:                number;
+  idCasilla:                    number;
+  idPREP:                       number;
+  idCATD_Distrital:             number;
+  idCATD_Municipal:             number;
+  Distrito:                     string;
+  Municipio:                    string;
+  idSeccion:                    number;
+  seccion:                      string;
+  idUbicacionSeccion:           number;
+  claveCasilla:                 string;
+  nombreCasilla:                string;
+  numeroCasilla:                number;
+  numeroExtraordinariaContigua: number;
+  idTipoCasilla:                number;
+  listaNominal:                 number;
+  representantesPPyCI:          number;
+  boletas:                      number;
+  idMecanismoTraslado:          number;
+  id_zore_Are:                  number;
+  Are:                          number;
+  id_distrito_Zore:             number;
+  Zore:                         number;
+  id_distrito_Federal:          number;
+  Distrito_Federal:             string;
+  activa:                       boolean;
+  urnaElectronica:              boolean;
+  idCATD:                       number;
+  CATD:                         string;
+  numeroCATD:                   number;
+  idTipoCATD:                   number;
+}
+
+export interface CatdInterface {
+  ID: number,
+  CATD: string
+}
