@@ -51,10 +51,10 @@ export class AppComponent implements OnInit{
 
   }
 
-  initResultArray(casillasArray: CasillaInterface[], partidosArray: PartidoInterface[], cerosArray: Number[]): CasillaResult[] {
+  initResultArray(casillasArray: CasillaInterface[], partidosArray: PartidoInterface[], cerosArray: number[]): CasillaResult[] {
     let casillaResultArray: CasillaResult[] = []
     for(let i = 0; i < cerosArray.length; i ++) {
-      let arrayNodos = this.generarNodosArray((cerosArray[i] === 1), partidosArray);
+      let arrayNodos = this.generarNodosArray(cerosArray[i], partidosArray, casillasArray[i].idCasillaPREP);
       let item: CasillaResult = {
         idCasillaPREP: casillasArray[i].idCasillaPREP,
         distrito: casillasArray[i].Distrito,
@@ -63,8 +63,13 @@ export class AppComponent implements OnInit{
         casilla: casillasArray[i].claveCasilla,
         listaNominal: casillasArray[i].listaNominal,
         boletas: casillasArray[i].boletas,
+        boletasSobrantes: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
+        personasQueVotaron: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
+        representantesQueVotaron: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
+        votosSacadosDeLaUrna: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
         votos: arrayNodos,
-        contabiliza: (cerosArray[i] === 1) ? true : false,
+        total: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
+        contabiliza: (cerosArray[i] !== -1) ? true : false,
         urna_electronica: false
       }
       casillaResultArray.push(item)
@@ -72,40 +77,31 @@ export class AppComponent implements OnInit{
     return casillaResultArray
   }
 
-  generarNodosArray(esContable: boolean, partidosArray: PartidoInterface[]): NodoVotos[] {
-    let arrayNodos: NodoVotos[] = [
-      {
-        nombre: "boletasSobrantes",
-        votos: esContable ? 0 : -1
-      },
-      {
-        nombre: "personasQueVotaron",
-        votos: esContable ? 0 : -1
-      },
-      {
-        nombre: "representantesQueVotaron",
-        votos: esContable ? 0 : -1
-      },
-      {
-        nombre: "votosSacadosDeLaUrna",
-        votos: esContable ? 0 : -1
+  generarNodosArray(esContable: number, partidosArray: PartidoInterface[], idCasillaPREP: number): NodoVotos[] {
+    let arrayNodos: NodoVotos[] = []
+    let randIndex = this.getRandomInt(0, (partidosArray.length + 1))
+    for(let j = 0; j < partidosArray.length; j ++) {
+      if(esContable === -33 && randIndex === j){
+        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable })
+        // console.log("idCasillaPREP: ", idCasillaPREP)
+      }else{
+        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: 0 })
       }
-    ]
-    for(let j = 0; j < partidosArray.length; j ++){
-      arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable ? 0 : -1 })
     }
-    arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: esContable ? 0 : -1 })
-    arrayNodos.push({ nombre: "votosNulos", votos: esContable ? 0 : -1 })
-    arrayNodos.push({ nombre: "total", votos: esContable ? 0 : -1 })
 
+    if(esContable === -33 && randIndex === partidosArray.length) {
+      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: esContable })
+      // console.log("idCasillaPREP: ", idCasillaPREP)
+    }else {
+      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: 0 })
+    }
+    if(esContable === -33 && randIndex === partidosArray.length + 1) {
+      arrayNodos.push({ nombre: "votosNulos", votos: esContable })
+      // console.log("idCasillaPREP: ", idCasillaPREP)
+    }else {
+      arrayNodos.push({ nombre: "votosNulos", votos: 0 })
+    }
     return arrayNodos
-  }
-
-  generaNoContabilizaArray(size: number): Number[] {
-    let porcentaje_sin_contabilizar = size * (10 / 100);
-    let cantidad_sin_contabilizar = Math.ceil(porcentaje_sin_contabilizar);
-    let array_sin_contabilizar = this.generarArrayDeUnosYCeros(size, cantidad_sin_contabilizar);
-    return array_sin_contabilizar
   }
 
   getRandomInt(min: number, max: number): number {
@@ -114,15 +110,24 @@ export class AppComponent implements OnInit{
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
+  generaNoContabilizaArray(size: number): number[] {
+    let porcentaje_sin_contabilizar = size * (10 / 100);
+    let cantidad_sin_contabilizar = Math.ceil(porcentaje_sin_contabilizar);
+    let array_sin_contabilizar = this.generarArrayDeUnosYCeros(size, cantidad_sin_contabilizar);
+    return array_sin_contabilizar
+  }
+
   generarArrayDeUnosYCeros(size: number, cerosQuantity: number): number[] {
     if (cerosQuantity > size) { throw new Error("El número de unos no puede ser mayor que el tamaño del array."); }
     const array: number[] = [];
     // Agregar ceros al array
-    for (let i = 0; i < cerosQuantity; i++) { array.push(0); }
+    for (let i = 0; i < cerosQuantity/2; i++) { array.push(-1); }
+    for (let i = Math.ceil(cerosQuantity/2); i < cerosQuantity; i++) { array.push(-33); }
     // Agregar unos al array para completar el tamaño
-    for (let i = cerosQuantity; i < size; i++) { array.push(1); }
+    for (let i = cerosQuantity; i < size; i++) { array.push(0); }
     // Mezclar el array aleatoriamente
     array.sort(() => Math.random() - 0.5);
+    console.log("leng: ", array.length)
     return array;
   }
 }

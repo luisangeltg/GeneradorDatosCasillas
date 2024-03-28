@@ -6,7 +6,12 @@ export interface CasillaResult {
   casilla: string;
   listaNominal: number;
   boletas: number;
+  boletasSobrantes: number;
+  personasQueVotaron: number;
+  representantesQueVotaron: number;
+  votosSacadosDeLaUrna: number;
   votos: NodoVotos[];
+  total: number;
   contabiliza: boolean;
   urna_electronica: boolean;
 }
