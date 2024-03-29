@@ -33,7 +33,7 @@ export class AppComponent implements OnInit{
     const coaliciones = this.partidosArray.filter((partido) => partido.coalicion === true)
 
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
-      return total + casilla.listaNominal
+      return total + casilla.boletas
     }, 0);
 
     console.log("casillas: ", this.casillasArray)
@@ -48,6 +48,10 @@ export class AppComponent implements OnInit{
   }
 
   getArrayRandN(size: number, max: number) {
+
+  }
+
+  generarMatrizCalculada(resultArrayCasillas: CasillaResult[]) {
 
   }
 
