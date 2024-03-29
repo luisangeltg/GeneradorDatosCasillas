@@ -51,7 +51,7 @@ export class AppComponent implements OnInit{
 
   }
 
-  generarMatrizCalculada(resultArrayCasillas: CasillaResult[]) {
+  generarMatrizCalculada(resultArrayCasillas: CasillaResult[], sumaObjetivo: number) {
 
   }
 
