@@ -44,11 +44,39 @@ export class AppComponent implements OnInit{
     console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generaNoContabilizaArray(this.casillasArray.length));
     console.log("result array: ", this.resultArrayCasillas);
-
+    console.log("rand array 0: ", this.generarRandArray(this.resultArrayCasillas[0].votos, this.resultArrayCasillas[0].boletas), "objetivo: ", this.resultArrayCasillas[0].boletas)
   }
 
   getArrayRandN(size: number, max: number) {
 
+  }
+
+                  //votos: arreglo de votos, sumaObjetivo:
+  generarRandArray(partidos: NodoVotos[], sumaObjetivo: number): number[] {
+    let array: number[] = []
+    let returnVotos: number[] = []
+    for(let i = 0; i < partidos.length; i ++) {
+      if(partidos[i].votos !== -1 && partidos[i].votos !== -33) {
+        let rand = this.getRandomInt(this.diferenciaSA(returnVotos, sumaObjetivo));
+        returnVotos.push(rand)
+      } else {
+        returnVotos.push(partidos[i].votos)
+      }
+    }
+
+    return returnVotos
+  }
+
+  diferenciaSA(numbers: number[], objetivo: number): number {//diferencia entre un array y la suma objetivo
+    let _total = 0;
+    if(numbers.length > 0) {
+      _total = numbers.reduce((total, item) => {
+        let sum = (item !== -1 && item !== -33) ? item : 0;
+        return total + sum
+      });
+    }
+    console.log((objetivo - _total))
+    return objetivo - _total
   }
 
   initResultArray(casillasArray: CasillaInterface[], partidosArray: PartidoInterface[], cerosArray: number[]): CasillaResult[] {
@@ -79,7 +107,7 @@ export class AppComponent implements OnInit{
 
   generarNodosArray(esContable: number, partidosArray: PartidoInterface[], idCasillaPREP: number): NodoVotos[] {
     let arrayNodos: NodoVotos[] = []
-    let randIndex = this.getRandomInt(0, (partidosArray.length + 1))
+    let randIndex = this.getRandomInt((partidosArray.length + 1))
     for(let j = 0; j < partidosArray.length; j ++) {
       if(esContable === -33 && randIndex === j){
         arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable })
@@ -104,10 +132,8 @@ export class AppComponent implements OnInit{
     return arrayNodos
   }
 
-  getRandomInt(min: number, max: number): number {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
+  getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
   }
 
   generaNoContabilizaArray(size: number): number[] {
