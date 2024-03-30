@@ -8,7 +8,6 @@ export interface CasillaResult {
   boletas: number;
   boletasSobrantes: number;
   personasQueVotaron: number;
-  representantesQueVotaron: number;
   votosSacadosDeLaUrna: number;
   votos: NodoVotos[];
   total: number;

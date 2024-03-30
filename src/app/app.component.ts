@@ -31,44 +31,101 @@ export class AppComponent implements OnInit{
   clickBtn(): void {
     const partidos_sin_coalicion = this.partidosArray.filter((partido) => partido.coalicion === false)
     const coaliciones = this.partidosArray.filter((partido) => partido.coalicion === true)
+    let filteredArray: CasillaInterface[] = []
+    for(let i = 0; i < 7; i ++){
+      filteredArray.push(this.casillasArray[i])
+    }
 
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
     }, 0);
+    totalBoletas *= 0.6
+
+    let columnas = (partidos_sin_coalicion.length + 2)
 
     console.log("casillas: ", this.casillasArray)
     // console.log("partidos: ", this.partidosArray)
     // console.log("coaliciones: ", coaliciones)
     // console.log("sin coaliciones: ", partidos_sin_coalicion)
-    // console.log("totalBoletas: ", totalBoletas)
-    console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
+    console.log("totalBoletas: ", totalBoletas)
+    // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generaNoContabilizaArray(this.casillasArray.length));
     console.log("result array: ", this.resultArrayCasillas);
-    console.log("rand array 0: ", this.generarRandArray(this.resultArrayCasillas[0].votos, this.resultArrayCasillas[0].boletas), "objetivo: ", this.resultArrayCasillas[0].boletas)
+    //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
+    let matriz = this.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
+    console.log(matriz)
+
+    let acum = 0;
+    for(let i = 0; i < columnas; i ++) {
+        for(let j = 0; j < matriz.length; j ++){
+            acum += (matriz[j][i])
+        }
+        console.log("i: ", i, ", valor: ", Math.round(acum));
+        acum = 0;
+    }
+
   }
-
-  getArrayRandN(size: number, max: number) {
-
-  }
-
-  generarMatrizCalculada(resultArrayCasillas: CasillaResult[], sumaObjetivo: number) {
-
-  }
-
                   //votos: arreglo de votos, sumaObjetivo:
   generarRandArray(partidos: NodoVotos[], sumaObjetivo: number): number[] {
     let array: number[] = []
     let returnVotos: number[] = []
     for(let i = 0; i < partidos.length; i ++) {
       if(partidos[i].votos !== -1 && partidos[i].votos !== -33) {
-        let rand = this.getRandomInt(this.diferenciaSA(returnVotos, sumaObjetivo));
+        let rand: number
+        if(i === 0){
+          rand = this.getRandomInt(14);
+        } else {
+          rand = this.getRandomInt(this.diferenciaSA(returnVotos, sumaObjetivo));
+        }
         returnVotos.push(rand)
       } else {
         returnVotos.push(partidos[i].votos)
       }
     }
-
     return returnVotos
+  }
+
+  generarMatrizCalculada(filas: number, columnas: number, sumatoriaColumna: number): number[][] {
+    let matriz: number[][] = [];
+    for (let i = 0; i < filas; i++) {
+        matriz[i] = [];
+        for (let j = 0; j < columnas; j++) {
+            let valorAleatorio;
+            if (j === 0) {
+                // Generar un número aleatorio entre 0 y 14 para la primera columna
+                valorAleatorio = Math.floor(Math.random() * 15);
+            } else {
+                // Generar un número entero aleatorio no negativo para las otras columnas
+                valorAleatorio = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+            }
+            matriz[i][j] = valorAleatorio;
+        }
+    }
+    // Ajustar la sumatoria de cada columna
+    for (let j = 0; j < columnas; j++) {
+        let sumatoriaActual = matriz.reduce((acc, fila) => acc + fila[j], 0);
+        // console.log("sumatoriaActual: ", sumatoriaActual)
+        let factorEscala = sumatoriaColumna / sumatoriaActual;
+        // console.log("sumatoriaColumna: ",sumatoriaColumna)
+        matriz.forEach((fila) => {
+          if(j !== 0)
+            fila[j] *= factorEscala
+        });
+    }
+    for(let i = 0; i < filas; i ++) {
+      let sum = matriz[i].reduce((total, item) => {
+        return total + item
+      }, 0)
+      console.log("sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
+    }
+    return matriz;
+  }
+
+  ajustarDatosMatriz(matriz: number[][], casillas: CasillaResult[]): CasillaResult[] {
+    let resp: CasillaResult[] = []
+
+
+    return resp
   }
 
   diferenciaSA(numbers: number[], objetivo: number): number {//diferencia entre un array y la suma objetivo
@@ -97,7 +154,6 @@ export class AppComponent implements OnInit{
         boletas: casillasArray[i].boletas,
         boletasSobrantes: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
         personasQueVotaron: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
-        representantesQueVotaron: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
         votosSacadosDeLaUrna: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
         votos: arrayNodos,
         total: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
@@ -112,6 +168,13 @@ export class AppComponent implements OnInit{
   generarNodosArray(esContable: number, partidosArray: PartidoInterface[], idCasillaPREP: number): NodoVotos[] {
     let arrayNodos: NodoVotos[] = []
     let randIndex = this.getRandomInt((partidosArray.length + 1))
+
+    if(esContable === -33 && randIndex === partidosArray.length) {
+      arrayNodos.push({ nombre: "representantesQueVotaron", votos: esContable })
+      // console.log("idCasillaPREP: ", idCasillaPREP)
+    }else {
+      arrayNodos.push({ nombre: "representantesQueVotaron", votos: 0 })
+    }
     for(let j = 0; j < partidosArray.length; j ++) {
       if(esContable === -33 && randIndex === j){
         arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable })
@@ -121,6 +184,7 @@ export class AppComponent implements OnInit{
       }
     }
 
+  // representantesQueVotaron: number;
     if(esContable === -33 && randIndex === partidosArray.length) {
       arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: esContable })
       // console.log("idCasillaPREP: ", idCasillaPREP)
