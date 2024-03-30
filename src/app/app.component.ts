@@ -85,8 +85,25 @@ export class AppComponent implements OnInit{
     return returnVotos
   }
 
+  ajustarMatrizCalculada(columnas: number, sumatoriaColumna: number, matriz: number[][]): number[][] {
+    for (let j = 0; j < columnas; j++) {
+      let sumatoriaActual = matriz.reduce((acc, fila) => acc + fila[j], 0);
+      // console.log("sumatoriaActual: ", sumatoriaActual)
+      let factorEscala = sumatoriaColumna / sumatoriaActual;
+      // console.log("sumatoriaColumna: ",sumatoriaColumna)
+      matriz.forEach((fila) => {
+        if(j !== 0)
+          fila[j] *= factorEscala
+      });
+    }
+
+    return matriz
+  }
+
   generarMatrizCalculada(filas: number, columnas: number, sumatoriaColumna: number): number[][] {
     let matriz: number[][] = [];
+    let countOver: number = 0
+
     for (let i = 0; i < filas; i++) {
         matriz[i] = [];
         for (let j = 0; j < columnas; j++) {
@@ -116,8 +133,14 @@ export class AppComponent implements OnInit{
       let sum = matriz[i].reduce((total, item) => {
         return total + item
       }, 0)
-      console.log("sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
+      console.log("i: ", i,", sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
+      // if(sum > this.casillasArray[i].boletas) {
+      //   countOver += 1
+      //   console.log("i: ", i,", sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
+      // }
+
     }
+    console.log("countOver: ", countOver)
     return matriz;
   }
 
