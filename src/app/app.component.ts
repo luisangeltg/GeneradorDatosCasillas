@@ -91,15 +91,83 @@ export class AppComponent implements OnInit{
     // for(let i = 0; i < matrizAjustada.length; i ++) {
     //   console.log(`array: ${matrizAjustada[i]}, suma: ${this.getSumColumns(matrizAjustada[i])}, boletas: ${this.casillasArray[i].boletas}`)
     // }
-    //total columnas
-    let acum = 0;
-    for(let i = 0; i < matrizAjustada[0].length; i ++) {
-        for(let j = 0; j < matrizAjustada.length; j ++) {
-            acum += (matrizAjustada[j][i])
+
+
+    let matrizFinal: number[][] = []
+    //************** CALCULAR MATRIZ FINAL ****************/
+    for(let i = 0; i < this.casillasArray.length; i ++) {
+      if(this.resultArrayCasillas[i].contabiliza) {
+        let i_array: number[] = []
+        let _votos = this.resultArrayCasillas[i].votos;
+        // i_array.push(...matrizAjustada[i])
+        for(let n = 0; n < matrizAjustada[i].length; n ++) {
+          if(_votos[n].votos != -33) {
+            i_array.push(Math.floor(matrizAjustada[i][n]));
+          } else {
+            console.log(`---------------index-NoContable: ${i}, ${this.resultArrayCasillas[i].contabiliza}`)
+            i_array.push(-33);
+          }
         }
-        console.log("i: ", i, ", valor: ", Math.round(acum));
+        matrizFinal.push(...[i_array])
+      } else {
+        let i_array: number[] = []
+        for(let m = 0; m < matrizAjustada[i].length; m ++) { i_array.push(-1) }
+        matrizFinal.push(...[i_array]);
+      }
+    }
+
+    console.log("matriz final: ", matrizFinal)
+
+    //total columnas
+    let acumColumna = 0, acum = 0;
+    for(let i = 0; i < matrizAjustada[0].length; i ++) {
+        for(let j = 0; j < matrizAjustada.length; j ++)
+            if(matrizFinal[i][j] != -1 && matrizFinal[i][j] != -33) acum += Math.floor(matrizFinal[j][i])
+        if(i > 0) acumColumna += acum;
         acum = 0;
     }
+    acumColumna = Math.floor(acumColumna/(matrizAjustada[0].length - 1));
+    let acumArray: number[] = [];
+
+    for(let i = 0; i < matrizAjustada[0].length; i ++) {
+      for(let j = 0; j < matrizAjustada.length; j ++)
+          if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) acum += Math.floor(matrizFinal[j][i])
+      if(i > 0) {
+        acumArray.push(acum-acumColumna)
+        console.log(`diferencia: ${(acum-acumColumna)}, acum: ${acum}, acumCol: ${acumColumna}`)
+      }
+      acum = 0;
+    }
+    console.log(acumArray)
+
+    let _matrizFinal: number[][] = [...matrizFinal]
+    let _acumArray: number[] = []
+    _acumArray.push(...acumArray)
+    for(let i = 0; i < _matrizFinal.length; i ++) {
+      for(let j = 0; j < _matrizFinal[i].length; j ++) {
+        let rand = this.getRandomInt(_acumArray[j])
+        if(_acumArray[j] > 0 && ((_matrizFinal[i][j + 1] - rand) > 0)) {
+          _matrizFinal[i][j] = _matrizFinal[i][j + 1] - (rand)
+          _acumArray[j] = (_acumArray[j] - (rand))
+          // console.log(`****** i: ${i}, j: ${j} - operacion: ${_matrizFinal[i][j]} - ${rand} = ${(_matrizFinal[i][j] - rand)}`)
+          // j ++;
+        }
+      }
+    }
+
+    acum = 0;
+    for(let i = 0; i < _matrizFinal[0].length; i ++) {
+        for(let j = 0; j < _matrizFinal.length; j ++)
+            if(_matrizFinal[i][j] != -1 && _matrizFinal[i][j] != -33) acum += (_matrizFinal[j][i])
+        if(i > 0) { acumColumna += acum; }
+        console.log(`columna: ${i}, suma: ${acum}`)
+        acum = 0;
+    }
+
+
+    //*************** CALCULAR NUEVO PROMEDIO POR COLUMNA *******************/
+
+
 
   }
 
