@@ -39,7 +39,7 @@ export class AppComponent implements OnInit{
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
     }, 0);
-    totalBoletas *= 0.6
+    totalBoletas *= 1.0
 
     let columnas = (partidos_sin_coalicion.length + 2)
 
@@ -53,19 +53,57 @@ export class AppComponent implements OnInit{
     console.log("result array: ", this.resultArrayCasillas);
     //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
     let matriz = this.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
-    console.log(matriz)
+    // let countOver = 0, filas = matriz.length
+    // for(let i = 0; i < filas; i ++) {
+    //   let sum = this.getSumColumns(matriz, i)
+    //   if(sum > this.casillasArray[i].boletas) {
+    //     countOver += 1
+    //     console.log("******************antes-i: ", i, ", valores: ", matriz[i])
+    //     console.log("*************antes-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
+    //   }
+    // }
+    // console.log("----------over: ", countOver)
+    let matrizAjustada = this.ajustarDatosMatriz(matriz) //primera vuelta
+    // let matrizAjustada2 = this.ajustarDatosMatriz(matrizAjustada1) //segunda vuelta
+    // let matrizAjustada3 = this.ajustarDatosMatriz(matrizAjustada2) //segunda vuelta
 
+    let countOver = -1, filas = matrizAjustada.length
+    while(countOver !== 0) {
+      for(let i = 0; i < filas; i ++) {
+        if(i === -1)
+          countOver = 0
+        let sum = Math.floor(this.getSumColumns(matrizAjustada[i]))
+
+        if(sum > this.casillasArray[i].boletas) {
+          countOver += 1
+          // console.log("******************ajustada-i: ", i, ", valores: ", matrizAjustada[i])
+          // console.log("*************ajustada-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
+        } else {
+          if(countOver == -1) countOver = 0
+        }
+      }
+      // console.log("----------over: ", countOver)
+      if(countOver !== 0) {
+        countOver = -1
+        matrizAjustada = this.ajustarDatosMatriz(matrizAjustada)
+      }
+    }
+    // for(let i = 0; i < matrizAjustada.length; i ++) {
+    //   console.log(`array: ${matrizAjustada[i]}, suma: ${this.getSumColumns(matrizAjustada[i])}, boletas: ${this.casillasArray[i].boletas}`)
+    // }
+    //total columnas
     let acum = 0;
-    for(let i = 0; i < columnas; i ++) {
-        for(let j = 0; j < matriz.length; j ++){
-            acum += (matriz[j][i])
+    for(let i = 0; i < matrizAjustada[0].length; i ++) {
+        for(let j = 0; j < matrizAjustada.length; j ++) {
+            acum += (matrizAjustada[j][i])
         }
         console.log("i: ", i, ", valor: ", Math.round(acum));
         acum = 0;
     }
 
   }
-                  //votos: arreglo de votos, sumaObjetivo:
+
+  //votos: arreglo de votos, sumaObjetivo:
   generarRandArray(partidos: NodoVotos[], sumaObjetivo: number): number[] {
     let array: number[] = []
     let returnVotos: number[] = []
@@ -85,24 +123,8 @@ export class AppComponent implements OnInit{
     return returnVotos
   }
 
-  ajustarMatrizCalculada(columnas: number, sumatoriaColumna: number, matriz: number[][]): number[][] {
-    for (let j = 0; j < columnas; j++) {
-      let sumatoriaActual = matriz.reduce((acc, fila) => acc + fila[j], 0);
-      // console.log("sumatoriaActual: ", sumatoriaActual)
-      let factorEscala = sumatoriaColumna / sumatoriaActual;
-      // console.log("sumatoriaColumna: ",sumatoriaColumna)
-      matriz.forEach((fila) => {
-        if(j !== 0)
-          fila[j] *= factorEscala
-      });
-    }
-
-    return matriz
-  }
-
   generarMatrizCalculada(filas: number, columnas: number, sumatoriaColumna: number): number[][] {
     let matriz: number[][] = [];
-    let countOver: number = 0
 
     for (let i = 0; i < filas; i++) {
         matriz[i] = [];
@@ -118,6 +140,7 @@ export class AppComponent implements OnInit{
             matriz[i][j] = valorAleatorio;
         }
     }
+
     // Ajustar la sumatoria de cada columna
     for (let j = 0; j < columnas; j++) {
         let sumatoriaActual = matriz.reduce((acc, fila) => acc + fila[j], 0);
@@ -129,27 +152,128 @@ export class AppComponent implements OnInit{
             fila[j] *= factorEscala
         });
     }
-    for(let i = 0; i < filas; i ++) {
-      let sum = matriz[i].reduce((total, item) => {
-        return total + item
-      }, 0)
-      console.log("i: ", i,", sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
-      // if(sum > this.casillasArray[i].boletas) {
-      //   countOver += 1
-      //   console.log("i: ", i,", sumatoria: ", sum, ", boletas: ", this.casillasArray[i].boletas, ", es mayor: ", (sum >= this.casillasArray[i].boletas))
-      // }
-
-    }
-    console.log("countOver: ", countOver)
     return matriz;
   }
 
-  ajustarDatosMatriz(matriz: number[][], casillas: CasillaResult[]): CasillaResult[] {
-    let resp: CasillaResult[] = []
-
-
-    return resp
+  buscarIndiceRestar(j: number, valor: number, _matriz: number[][]): number {
+    let i = -1;
+    for(let n = 0; n < this.casillasArray.length;) {
+      if((_matriz[n][j] - valor) > 0) {
+        i = n;
+        break;
+      } else {
+        n ++;
+      }
+    }
+    return i;
   }
+
+  ajustarDatosMatriz(retMatriz: number[][]): number[][] {
+    let resp: CasillaResult[] = []
+    let _matriz: number[][] = []
+
+    let countOver = 0, filas = retMatriz.length, acumDiff = 0
+    for(let i = 0; i < filas;) {
+      let sum = this.getSumColumns(retMatriz[i])
+      if(sum > this.casillasArray[i].boletas) {
+        let valorDiferencia = sum - this.casillasArray[i].boletas
+        while(valorDiferencia !== 0) {
+          let i_noEsMayor = this.buscarEsMenor(retMatriz)
+          let sumNoEsMayor = this.getSumColumns(retMatriz[i_noEsMayor])
+          let diff = 0
+          if((valorDiferencia + sumNoEsMayor) <= this.casillasArray[i_noEsMayor].boletas) { // en este caso entra si la sumatoria es menor al numero de boletas
+            diff = valorDiferencia/(retMatriz[i_noEsMayor].length - 1)
+            // console.log("*************** i: ", i, ", diff: ", diff)
+          } else {
+            let newValorDiferencia = valorDiferencia - (this.casillasArray[i_noEsMayor].boletas - sumNoEsMayor)
+            diff = newValorDiferencia/(retMatriz[i_noEsMayor].length - 1)
+            // console.log("--------------- i: ", i, ", diff: ", diff)
+            // console.log("valorDiferencia: ", valorDiferencia, ", newValorDiferencia: ", newValorDiferencia)
+            // console.log(`xxxxxxxxxxx-${(sumNoEsMayor + valorDiferencia)}, ${this.casillasArray[i_noEsMayor].boletas}`)
+            // console.log(`zzzzzzzzzzz-${((sumNoEsMayor + valorDiferencia) - this.casillasArray[i_noEsMayor].boletas)}`)
+            // console.log("i: ", i, ", diffotra: ", diff)
+            valorDiferencia = newValorDiferencia
+          }
+          // console.log("antes i: ", i, ", ", retMatriz[i])
+          // console.log(`sum-antes: ${this.getSumColumns(retMatriz, i)}, boletas: ${this.casillasArray[i].boletas}, diff: ${diff}`)
+          // console.log(`i: ${i}, i_noEsMayor: ${i_noEsMayor}`)
+          //_matriz[i] = _matriz[i].map(item => item - diff) // resta valores a columnas de la fila donde excedio el numero de boletas
+          for(let n = 1; n < retMatriz[i].length; n ++) {
+            if((retMatriz[i][n] - diff) >= 0) {
+              retMatriz[i][n] -= diff
+            } else {
+              let _i = this.buscarIndiceRestar(n, (retMatriz[i][n]), retMatriz)
+              retMatriz[_i][n] -= diff;
+              // console.log(`i: ${_i}, diff: ${diff}, ${retMatriz[_i][n]} - ${diff} = ${((retMatriz[_i][n] - diff))}`)
+            }
+
+            // console.log(`${i}, ${n}: ${(_matriz[i][n] - diff)}`)
+          }
+          // console.log("despues i: ", i, ", ", retMatriz[i])
+          // console.log(`sum-despues: ${this.getSumColumns(retMatriz, i)}, boletas: ${this.casillasArray[i].boletas}, diff: ${diff}`)
+          for(let n = 1; n < retMatriz[i_noEsMayor].length; n ++) {
+            retMatriz[i_noEsMayor][n] += diff
+            // console.log(`${i}, ${n}: ${(_matriz[i_noEsMayor][n] + diff)}`)
+          }
+
+          // console.log("final-1 i: ", i, ", ", retMatriz[i])
+          // console.log(`sum-final-1: ${this.getSumColumns(retMatriz[i])}, boletas: ${this.casillasArray[i].boletas}, diff: ${diff}`)
+          // console.log("-------------------------")
+          // console.log("final-2 i: ", i_noEsMayor, ", ", retMatriz[i_noEsMayor])
+          // console.log(`sum-final-2: ${this.getSumColumns(retMatriz[i_noEsMayor])}, boletas: ${this.casillasArray[i_noEsMayor].boletas}, diff: ${diff}`)
+
+          if((valorDiferencia + sumNoEsMayor) <= this.casillasArray[i_noEsMayor].boletas || i == i_noEsMayor) {
+            i++
+            valorDiferencia = 0
+          }
+          //_matriz[i_noEsMayor] = _matriz[i_noEsMayor].map(item => item + diff) // suma valores a columnas
+        }
+      } else {
+        i++
+      }
+    }
+
+    // countOver = 0, filas = retMatriz.length
+    // for(let i = 0; i < filas; i ++) {
+    //   let sum = this.getSumColumns(retMatriz, i)
+    //   if(sum > this.casillasArray[i].boletas) {
+    //     countOver += 1
+        // console.log("******************ajustada-i: ", i, ", valores: ", retMatriz[i])
+        // console.log("*************ajustada-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
+    //   }
+    // }
+    // console.log("----------over: ", countOver)
+
+    for(let x = 0; x < retMatriz.length; x ++) {
+      // console.log(`i: ${x}, sum: ${this.getSumColumns(retMatriz[x])}, boletas: ${this.casillasArray[x].boletas}`)
+      _matriz.push([...retMatriz[x]])
+    }
+
+    return _matriz
+  }
+
+  getSumColumns(matriz: number[]): number {
+    let sum = matriz.reduce((total, item) => {
+      return total + item
+    }, 0)
+
+    return sum
+  }
+
+  buscarEsMenor(matriz: number[][]): number {
+    let index = 0, filas = matriz.length
+
+    for(let i = 0; i < filas; i ++) {
+      let sum = this.getSumColumns(matriz[i])
+      if((sum <= this.casillasArray[i].boletas)) {
+        // console.log(`XXXXXXXXXXXXXXXXXXXXXX-compara: ${(sum <= this.casillasArray[i].boletas)} - ${sum}, ${this.casillasArray[i].boletas}`)
+        index = i
+        break
+      }
+    }
+    return index
+  }
+
 
   diferenciaSA(numbers: number[], objetivo: number): number {//diferencia entre un array y la suma objetivo
     let _total = 0;
