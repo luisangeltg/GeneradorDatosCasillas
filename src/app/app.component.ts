@@ -22,6 +22,9 @@ export class AppComponent implements OnInit{
       this.services.getCasillasByCatd(this.catdArray[0].CATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
       });
+      // this.services.getCasillas().subscribe((response) => {
+      //   this.casillasArray = response.CasillasResponse
+      // });
     });
     this.services.getPartidos().subscribe((response) => {
       this.partidosArray = response.PartidosResponse
@@ -44,10 +47,28 @@ export class AppComponent implements OnInit{
     let columnas = (partidos_sin_coalicion.length + 2)
 
     console.log("casillas: ", this.casillasArray)
+    // console.log("partidos: ", this.partidosArray)
+    // console.log("coaliciones: ", coaliciones)
+    // console.log("sin coaliciones: ", partidos_sin_coalicion)
     console.log("totalBoletas: ", totalBoletas)
+    // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generaNoContabilizaArray(this.casillasArray.length));
     console.log("result array: ", this.resultArrayCasillas);
+    //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
     let matriz = this.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
+    let matrizFinal = this.ajustarSumatoriaFinalMatriz(matriz)
+    console.log("matriz final: ", matrizFinal)
+
+  }
+
+  verificarBoletas(matriz: number[][]) {
+    for(let i = 0; i < this.resultArrayCasillas.length; i ++) {
+      if(this.getSumColumns(matriz[i])>this.resultArrayCasillas[i].boletas)
+        console.log(`supera-i: ${i}`)
+    }
+  }
+
+  ajustarSumatoriaFinalMatriz(matriz: number[][]): number[][] {
     let matrizAjustada = this.ajustarDatosMatriz(matriz) //primera vuelta
 
     let countOver = -1, filas = matrizAjustada.length
@@ -69,12 +90,14 @@ export class AppComponent implements OnInit{
       }
     }
 
+
     let matrizFinal: number[][] = []
     //************** CALCULAR MATRIZ FINAL ****************/
     for(let i = 0; i < this.casillasArray.length; i ++) {
       if(this.resultArrayCasillas[i].contabiliza) {
         let i_array: number[] = []
         let _votos = this.resultArrayCasillas[i].votos;
+        // i_array.push(...matrizAjustada[i])
         for(let n = 0; n < matrizAjustada[i].length; n ++) {
           if(_votos[n].votos != -33) {
             i_array.push(Math.floor(matrizAjustada[i][n]));
@@ -101,22 +124,23 @@ export class AppComponent implements OnInit{
     acumColumna = Math.floor(acumColumna/(matrizAjustada[0].length - 1));
     let acumArray: number[] = [];
 
-    for(let i = 1; i < matrizAjustada[0].length; i ++) {
+    for(let i = 1; i < matrizAjustada[0].length; i ++) {//se hace conteo de las columnas antes de ajustar cantidades
       for(let j = 0; j < matrizAjustada.length; j ++)
           if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) { acum += (matrizFinal[j][i]); }
       if(i > 0) {
         acumArray.push(acum-acumColumna)
+        console.log(`col: ${i}, diferencia: ${(acum-acumColumna)}, acum: ${acum}, acumCol: ${acumColumna}`)
       }
       acum = 0;
     }
+    console.log(acumArray)
 
     let _matrizFinal: number[][] = [...matrizFinal]
     let _acumArray: number[] = []
     _acumArray.push(...acumArray)
 
-    for(let j = 0, k = 1; j < _acumArray.length; j ++, k ++) {//se ajusta el numero total de boletas por columna
+    for(let j = 0, k = 1; j < _acumArray.length; j ++, k ++) {
       for(let i = 0; i < _matrizFinal.length; i ++) {
-      // let k = 1;
         let rand = 0
         let mat_value = _matrizFinal[i][k]
         if(mat_value !== -1 && mat_value !== -33) {
@@ -135,7 +159,16 @@ export class AppComponent implements OnInit{
       }
     }
 
-
+    acum = 0;
+    for(let i = 1; i < _matrizFinal[0].length; i ++) {// se hace conteo columnas despues de hacer ajuste en sumatorias
+        for(let j = 0; j < _matrizFinal.length; j ++)
+            if(_matrizFinal[j][i] != -1 && _matrizFinal[j][i] != -33) acum += (_matrizFinal[j][i])
+        if(i > 0) { acumColumna += acum;
+        console.log(`columna: ${i}, suma: ${acum}`) }
+        acum = 0;
+    }
+    console.log(_acumArray)
+    return _matrizFinal
   }
 
   //votos: arreglo de votos, sumaObjetivo:
