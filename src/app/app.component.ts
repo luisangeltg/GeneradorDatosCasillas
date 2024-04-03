@@ -39,33 +39,16 @@ export class AppComponent implements OnInit{
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
     }, 0);
-    totalBoletas *= 1.0
+    totalBoletas *= 0.9
 
     let columnas = (partidos_sin_coalicion.length + 2)
 
     console.log("casillas: ", this.casillasArray)
-    // console.log("partidos: ", this.partidosArray)
-    // console.log("coaliciones: ", coaliciones)
-    // console.log("sin coaliciones: ", partidos_sin_coalicion)
     console.log("totalBoletas: ", totalBoletas)
-    // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generaNoContabilizaArray(this.casillasArray.length));
     console.log("result array: ", this.resultArrayCasillas);
-    //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
     let matriz = this.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
-    // let countOver = 0, filas = matriz.length
-    // for(let i = 0; i < filas; i ++) {
-    //   let sum = this.getSumColumns(matriz, i)
-    //   if(sum > this.casillasArray[i].boletas) {
-    //     countOver += 1
-    //     console.log("******************antes-i: ", i, ", valores: ", matriz[i])
-    //     console.log("*************antes-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
-    //   }
-    // }
-    // console.log("----------over: ", countOver)
     let matrizAjustada = this.ajustarDatosMatriz(matriz) //primera vuelta
-    // let matrizAjustada2 = this.ajustarDatosMatriz(matrizAjustada1) //segunda vuelta
-    // let matrizAjustada3 = this.ajustarDatosMatriz(matrizAjustada2) //segunda vuelta
 
     let countOver = -1, filas = matrizAjustada.length
     while(countOver !== 0) {
@@ -76,22 +59,15 @@ export class AppComponent implements OnInit{
 
         if(sum > this.casillasArray[i].boletas) {
           countOver += 1
-          // console.log("******************ajustada-i: ", i, ", valores: ", matrizAjustada[i])
-          // console.log("*************ajustada-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
         } else {
           if(countOver == -1) countOver = 0
         }
       }
-      // console.log("----------over: ", countOver)
       if(countOver !== 0) {
         countOver = -1
         matrizAjustada = this.ajustarDatosMatriz(matrizAjustada)
       }
     }
-    // for(let i = 0; i < matrizAjustada.length; i ++) {
-    //   console.log(`array: ${matrizAjustada[i]}, suma: ${this.getSumColumns(matrizAjustada[i])}, boletas: ${this.casillasArray[i].boletas}`)
-    // }
-
 
     let matrizFinal: number[][] = []
     //************** CALCULAR MATRIZ FINAL ****************/
@@ -99,12 +75,10 @@ export class AppComponent implements OnInit{
       if(this.resultArrayCasillas[i].contabiliza) {
         let i_array: number[] = []
         let _votos = this.resultArrayCasillas[i].votos;
-        // i_array.push(...matrizAjustada[i])
         for(let n = 0; n < matrizAjustada[i].length; n ++) {
           if(_votos[n].votos != -33) {
             i_array.push(Math.floor(matrizAjustada[i][n]));
           } else {
-            console.log(`---------------index-NoContable: ${i}, ${this.resultArrayCasillas[i].contabiliza}`)
             i_array.push(-33);
           }
         }
@@ -115,8 +89,6 @@ export class AppComponent implements OnInit{
         matrizFinal.push(...[i_array]);
       }
     }
-
-    console.log("matriz final: ", matrizFinal)
 
     //total columnas
     let acumColumna = 0, acum = 0;
@@ -129,44 +101,39 @@ export class AppComponent implements OnInit{
     acumColumna = Math.floor(acumColumna/(matrizAjustada[0].length - 1));
     let acumArray: number[] = [];
 
-    for(let i = 0; i < matrizAjustada[0].length; i ++) {
+    for(let i = 1; i < matrizAjustada[0].length; i ++) {
       for(let j = 0; j < matrizAjustada.length; j ++)
-          if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) acum += Math.floor(matrizFinal[j][i])
+          if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) { acum += (matrizFinal[j][i]); }
       if(i > 0) {
         acumArray.push(acum-acumColumna)
-        console.log(`diferencia: ${(acum-acumColumna)}, acum: ${acum}, acumCol: ${acumColumna}`)
       }
       acum = 0;
     }
-    console.log(acumArray)
 
     let _matrizFinal: number[][] = [...matrizFinal]
     let _acumArray: number[] = []
     _acumArray.push(...acumArray)
-    for(let i = 0; i < _matrizFinal.length; i ++) {
-      for(let j = 0; j < _matrizFinal[i].length; j ++) {
-        let rand = this.getRandomInt(_acumArray[j])
-        if(_acumArray[j] > 0 && ((_matrizFinal[i][j + 1] - rand) > 0)) {
-          _matrizFinal[i][j] = _matrizFinal[i][j + 1] - (rand)
-          _acumArray[j] = (_acumArray[j] - (rand))
-          // console.log(`****** i: ${i}, j: ${j} - operacion: ${_matrizFinal[i][j]} - ${rand} = ${(_matrizFinal[i][j] - rand)}`)
-          // j ++;
+
+    for(let j = 0, k = 1; j < _acumArray.length; j ++, k ++) {//se ajusta el numero total de boletas por columna
+      for(let i = 0; i < _matrizFinal.length; i ++) {
+      // let k = 1;
+        let rand = 0
+        let mat_value = _matrizFinal[i][k]
+        if(mat_value !== -1 && mat_value !== -33) {
+          rand = this.getRandomInt(_acumArray[j])
+          if(rand == 0 && _acumArray[j] == 1)
+            rand = 1
+        }
+        if(
+            _acumArray[j] !=0 &&
+            ((mat_value - (rand)) >= 0 && rand !== 0) &&
+            (this.getSumColumns(_matrizFinal[i]) - (rand)) <= this.resultArrayCasillas[i].boletas
+          ) {
+            _matrizFinal[i][k] = _matrizFinal[i][k] - (rand)
+            _acumArray[j] = (_acumArray[j] - (rand))
         }
       }
     }
-
-    acum = 0;
-    for(let i = 0; i < _matrizFinal[0].length; i ++) {
-        for(let j = 0; j < _matrizFinal.length; j ++)
-            if(_matrizFinal[i][j] != -1 && _matrizFinal[i][j] != -33) acum += (_matrizFinal[j][i])
-        if(i > 0) { acumColumna += acum; }
-        console.log(`columna: ${i}, suma: ${acum}`)
-        acum = 0;
-    }
-
-
-    //*************** CALCULAR NUEVO PROMEDIO POR COLUMNA *******************/
-
 
 
   }
