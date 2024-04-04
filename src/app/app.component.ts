@@ -42,14 +42,14 @@ export class AppComponent implements OnInit{
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
     }, 0);
-    totalBoletas *= 0.9
+    totalBoletas *= 1.0
 
-    let columnas = (partidos_sin_coalicion.length + 2)
+    let columnas = (partidos_sin_coalicion.length + 3)
 
     console.log("casillas: ", this.casillasArray)
     // console.log("partidos: ", this.partidosArray)
-    // console.log("coaliciones: ", coaliciones)
-    // console.log("sin coaliciones: ", partidos_sin_coalicion)
+    console.log("coaliciones: ", coaliciones)
+    console.log("sin coaliciones: ", partidos_sin_coalicion)
     console.log("totalBoletas: ", totalBoletas)
     // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generaNoContabilizaArray(this.casillasArray.length));
@@ -58,7 +58,84 @@ export class AppComponent implements OnInit{
     let matriz = this.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
     let matrizFinal = this.ajustarSumatoriaFinalMatriz(matriz)
     console.log("matriz final: ", matrizFinal)
+    this.inicializarValoresArrayCasillas(matrizFinal, coaliciones);
+    console.log("Print result array: ", this.resultArrayCasillas);
+  }
 
+  inicializarValoresArrayCasillas(matriz: number[][], coaliciones: PartidoInterface[]) {
+    let porcentaje_sin_contabilizar = Math.ceil(matriz.length * (10 / 100));
+    let array_variaciones = this.ordenarVariacionesCeros(porcentaje_sin_contabilizar);
+
+    for(let i = 0, countNoContabiliza = 0; i < this.resultArrayCasillas.length; i ++) {
+      if(this.resultArrayCasillas[i].contabiliza) {
+        for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
+          let nodo_voto = this.resultArrayCasillas[i].votos[j]
+          if(nodo_voto.votos == -33) {
+            this.resultArrayCasillas[i].votos[j].votos = array_variaciones[countNoContabiliza]
+            countNoContabiliza ++;
+            // console.log(`index-mal: ${i}, j: ${j}`)
+          } else {
+            this.resultArrayCasillas[i].votos[j].votos = matriz[i][j]
+          }
+        }
+        // let votosCoaliciones: PartidoInterface[] = []
+        let votosCoaliciones: NodoVotos[] = []
+        for(let n = 0; n < coaliciones.length; n ++) {
+          let partidos_de_coalicion = coaliciones[n].siglasPartido.split('_')
+          votosCoaliciones.push({nombre: coaliciones[n].siglasPartido, votos: 0})
+          for(let s = 0; s < partidos_de_coalicion.length; s ++) {
+            for(let m = 0; m < this.resultArrayCasillas[i].votos.length; m ++) {
+              if(
+                partidos_de_coalicion[s] == this.resultArrayCasillas[i].votos[m].nombre &&
+                this.resultArrayCasillas[i].votos[m].votos > 0
+              ) {
+                votosCoaliciones[n].votos += this.resultArrayCasillas[i].votos[m].votos
+              }
+            }
+            // let index = this.resultArrayCasillas[i].votos.findIndex(voto => voto.nombre === partidos_de_coalicion[k])
+            // this.resultArrayCasillas[i].votos[index].votos
+          }
+        }
+        this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
+        if(this.resultArrayCasillas[i].contabiliza) {
+          this.resultArrayCasillas[i].boletasSobrantes = (this.resultArrayCasillas[i].boletas - this.obtenerSumatoriaTotalPartidosCoaliciones(i))
+          this.resultArrayCasillas[i].total = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
+          this.resultArrayCasillas[i].personasQueVotaron = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
+        }
+        // console.log("coaliciones: ", votosCoaliciones, ", normales: ", this.resultArrayCasillas[i].votos)
+      } else {
+        for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
+          this.resultArrayCasillas[i].votos[j].votos = array_variaciones[countNoContabiliza]
+        }
+        countNoContabiliza ++
+      }
+    }
+  }
+
+  obtenerSumatoriaTotalPartidosCoaliciones(i: number): number {
+    let sum = this.resultArrayCasillas[i].votos.reduce((total, partido) => {
+      let votos = (
+          partido.nombre !== 'representantesQueVotaron' &&
+          partido.nombre !== 'candidatosNoRegistrados' &&
+          partido.nombre !== 'votosNulos' &&
+          partido.votos > 0
+        ) ? partido.votos : 0
+      return total + (votos)
+    }, 0)
+    return sum
+  }
+
+  ordenarVariacionesCeros(size: number): number[] {
+    let array_variaciones: number[] = []
+    let val = -1;
+    while(size > 0) {
+      if(val == -4)
+        val = -1
+      array_variaciones.push(val)
+      val--
+      size--
+    }
+    return array_variaciones
   }
 
   verificarBoletas(matriz: number[][]) {
@@ -163,8 +240,10 @@ export class AppComponent implements OnInit{
     for(let i = 1; i < _matrizFinal[0].length; i ++) {// se hace conteo columnas despues de hacer ajuste en sumatorias
         for(let j = 0; j < _matrizFinal.length; j ++)
             if(_matrizFinal[j][i] != -1 && _matrizFinal[j][i] != -33) acum += (_matrizFinal[j][i])
-        if(i > 0) { acumColumna += acum;
-        console.log(`columna: ${i}, suma: ${acum}`) }
+        if(i > 0) {
+          acumColumna += acum;
+          console.log(`columna: ${i}, suma: ${acum}`);
+        }
         acum = 0;
     }
     console.log(_acumArray)
