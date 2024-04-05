@@ -16,7 +16,7 @@
     <div class="container">
       <!-- Content here -->
       <div class="col-md-6">
-        <form>
+        <div>
           <div class="form-group">
             <label for="exampleInputEmail1">Seleccionar CATD: </label>
             <select [(ngModel)]="selected_CATD" (change)="changeSelect()" class="form-select form-select-lg mb-3" aria-label="Large select example">
@@ -28,9 +28,61 @@
           <div class="col-auto">
             <button (click)="generarData()" class="btn btn-success mb-3">Generar Excel</button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
+    <div style="background-color: black; color: white;" class="shaped-footer d-flex flex-column flex-lg-row flex-xl-row py-4 align-items-center text-center text-lg-left text-xl-left px-5">
+      <div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 p-1  d-flex flex-column align-items-center justify-content-center text">
+        <a style="height: 40%;" href="https://ietam.org.mx/PortalN/" target="_blank">
+
+          <img class="mb-4 w-60" src="../assets/imagenes-sistema/Logo-ietam-blanco.svg" alt="logo IETAM">
+        </a>
+        <p class="m-0 p-0 p-derechos">© Derechos Reservados, Instituto Electoral de Tamaulipas.</p>
+      </div>
+      <div
+        class="col-sm-12 col-md-12 col-lg-4 col-xl-4 p-1 mt-4 mt-md-4 mt-lg-0 mt-xl-0 d-flex flex-column justify-content-center">
+        <h4 class="p-white fs-20 p-titulos-footer">UBICACIÓN</h4>
+        <p class="p-white p-texto-footer mt-1">
+          Calle 13 Morelos Esquina No. 501 Oriente, Zona Centro, C.P. 87000
+        </p>
+        <p class="p-white p-texto-footer">
+          Ciudad Victoria, Tamaulipas.
+        </p>
+        <p class="p-white mt-1 p-texto-footer">
+          Sistema de Candidatas y Candidatos, Conóceles Versión 1.1.0
+        </p>
+      </div>
+      <div
+        class="col-sm-12 col-md-12 col-lg-4 col-xl-4 p-1 mt-4 mt-md-4 mt-lg-0 mt-xl-0 d-flex flex-column justify-content-center">
+        <h4 class="p-white p-titulos-footer">CONTACTO</h4>
+        <p class="p-white p-texto-footer">
+          Lada sin costo: 800 849 43 58
+        </p>
+        <p class="p-white p-texto-footer">
+          Desde cualquier parte del país: 834 31 5 1200
+        </p>
+        <div class="d-flex w-25 justify-content-between mx-auto">
+          <a href="https://www.facebook.com/todossomosietam" target="_blank"><img src="../assets/imagenes-sistema/Facebook.svg"
+              alt=""></a>
+          <a href="https://twitter.com/TodosSomosIETAM" target="_blank"><img src="../assets/imagenes-sistema/X.svg" alt=""></a>
+          <a href="https://www.youtube.com/user/IETAMOficial/featured" target="_blank"><img
+              src="../assets/imagenes-sistema/YouTube.svg" alt=""></a>
+          <a href="https://www.instagram.com/ietam_oficial" target="_blank"><img src="../assets/imagenes-sistema/Instagram.svg"
+              alt=""></a>
+        </div>
+        <div class="p-white mt-2 p-texto-footer">
+          <a class="p-white p-texto-footer"
+            href="https://www.ietam.org.mx//PortalN/Paginas/Acerca_del_IETAM/IETAM.aspx" target="_blank">Acerca del IETAM</a>
+          |
+          <a class="p-white p-texto-footer"
+            href="https://www.ietam.org.mx//PortalN/Paginas/Transparencia/Transparencia.aspx" target="_blank">TRANSPARENCIA</a>
+          |
+          <a class="p-white p-texto-footer"
+            href="https://www.ietam.org.mx//PortalN/Paginas/GeografiaEl/Geografia_Electoral_2022.aspx#Presentacion" target="_blank">GEOGRAFÍA
+            ELECTORAL</a>
+        </div>
+      </div>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>

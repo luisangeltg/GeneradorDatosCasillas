@@ -1,1 +1,130 @@
 /* You can add global styles to this file, and also import other style files */
+//COLORES GLOBALES:
+$diputacion-color: #CD9E95;
+$diputacion-color-hover: #CD9E95;
+$ayuntamiento-color: #737261;
+$ayuntamiento-color-hover: #737261;
+$precidenciasM-color: #737261;
+$principal-color: #B28D00;
+$principal-oscuro-color: #867100;
+$secundario-color: #AF310B;
+$gris-oscuro--color: #969696;
+$gris-claro-color: #CCCCCC;
+$gris-claro-des-color: #858585;
+$text-color: #3A3A3A;
+$blanco-color: #FEFEFE;
+$negro-color: #202020;
+$textoTitulo: #393B3E;
+$verde-cards: #867100;
+$amarillo-crema: #F0E8C4;
+$controles-color: #7f7f7f;
+
+.header-size{
+    height: 10vh;
+}
+.logo_conoceles{
+    width: 37%;
+}
+.bg-inicio{
+    background-color: #F4F4F4;
+    min-height: 100vh !important;
+}
+
+.Tam-Decide{
+    height: 1.5rem;
+}
+
+.btn{
+    font-weight: 600;
+}
+
+.btn-ayuntamientos{
+    background-color: $ayuntamiento-color;
+}
+.btn-ayuntamientos:hover{
+    background-color: $ayuntamiento-color-hover;
+}
+
+.btn-diputaciones{
+    background-color:$principal-color;
+}
+.btn-diputaciones:hover{
+    background-color:$principal-oscuro-color;
+}
+// .h-fondoInicio{
+//    min-height: 88vh;
+// }
+
+.h-mapa{
+    max-height: 80vh;
+}
+.content-img{
+    z-index: 1; bottom: 0;
+}
+
+.mh-50{
+    max-height: 50%;
+}
+
+@media (max-width: 767px) {
+    .btn-display{
+        flex-direction: row;
+    }
+    .Tam-Decide{
+        height: 1.2rem;
+    }
+    .logo_conoceles{
+        width: 65%;
+    }
+
+    .header-size{
+        height: 6vh;
+    }
+}
+
+@media (max-height: 565px) or (max-width: 1030px) {
+    .content-img{
+        display: none;
+    }
+    .position-absolute{
+        position: static!important;
+    }
+}
+
+@media (max-height: 650px) {
+    .mh-50{
+        max-height: 45%;
+    }
+}
+
+@media (max-width: 636px){
+    .header-size{
+        height: 5vh;
+        margin-bottom: 1rem;
+    }
+    .logo_conoceles{
+        width: 60%;
+        //margin: 0 auto;
+    }
+
+    .Tam-Decide{
+        margin-top: 2rem !important;
+        margin: 0 auto;
+    }
+
+}
+
+
+//Footer
+.p-white {
+  color: #fff;
+}
+
+.p-titulos-footer {
+  font-size: 1.2rem;
+
+}
+
+.p-texto-footer {
+  font-size: 0.9rem;
+}
