@@ -11,13 +11,14 @@ export interface CasillaResult {
   votosSacadosDeLaUrna: number;
   votos: NodoVotos[];
   total: number;
-  contabiliza: boolean;
-  urna_electronica: boolean;
+  contabiliza: number;
+  urna_electronica: number;
 }
 
 export interface NodoVotos {
   nombre: string;
   votos: number;
+  tipo: number;//tipo 1 = ni partido ni coalicion, tipo 2 = partidos, tipo 3 = coaliciones
 }
 
 export interface CasillasResponse {

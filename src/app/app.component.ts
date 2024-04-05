@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CasillaInterface, CasillaResult, CatdInterface, CatdResponse, NodoVotos, PartidoInterface } from './services/interfaces';
 import { ServicesClass } from './services/services';
+import { ExcelService } from './services/excel.service';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,7 @@ import { ServicesClass } from './services/services';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit{
-  constructor(private services: ServicesClass){
+  constructor(private services: ServicesClass, private excelService: ExcelService){
   }
   title = 'DistribucionVotos';
   casillasArray!: CasillaInterface[];
@@ -19,12 +20,12 @@ export class AppComponent implements OnInit{
   ngOnInit(): void {
     this.services.getCATD().subscribe((response) => {
       this.catdArray = response.CatdResponse;
-      this.services.getCasillasByCatd(this.catdArray[0].CATD).subscribe((response) => {
-        this.casillasArray = response.CasillasResponse
-      });
-      // this.services.getCasillas().subscribe((response) => {
+      // this.services.getCasillasByCatd(this.catdArray[0].CATD).subscribe((response) => {
       //   this.casillasArray = response.CasillasResponse
       // });
+      this.services.getCasillas().subscribe((response) => {
+        this.casillasArray = response.CasillasResponse
+      });
     });
     this.services.getPartidos().subscribe((response) => {
       this.partidosArray = response.PartidosResponse
@@ -42,7 +43,7 @@ export class AppComponent implements OnInit{
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
     }, 0);
-    totalBoletas *= 1.0
+    totalBoletas *= 0.2;
 
     let columnas = (partidos_sin_coalicion.length + 3)
 
@@ -60,18 +61,72 @@ export class AppComponent implements OnInit{
     console.log("matriz final: ", matrizFinal)
     this.inicializarValoresArrayCasillas(matrizFinal, coaliciones);
     console.log("Print result array: ", this.resultArrayCasillas);
+    for(let i = 0; i < 12; i ++) {
+      let acum = 0
+      for(let j = 0; j < this.resultArrayCasillas.length; j ++) {
+        if(
+          this.resultArrayCasillas[j].contabiliza == 1 &&
+          this.resultArrayCasillas[j].votos[i].votos > 0
+        ) acum += this.resultArrayCasillas[j].votos[i].votos
+        // else console.log(`****error-val: ${this.resultArrayCasillas[j].votos[i].votos}, j: ${j}, i: ${i}`)
+        if(this.resultArrayCasillas[j].votos[i].votos < -3) console.log(`partido: ${this.resultArrayCasillas[0].votos[i].nombre}, sum: ${acum}`)
+      }
+    }
+    let jsonResponse = []
+    for(let i = 0; i < this.resultArrayCasillas.length; i ++) {
+      // console.log(`i: ${i}, sobrantes: ${this.resultArrayCasillas[i].boletasSobrantes}, boletas`)
+      jsonResponse.push(this.convertirVotosACasillaResult(this.resultArrayCasillas[i]))
+    }
+    console.log("jsonResponse: ", jsonResponse)
+
+
+    this.excelService.exportToExcel(
+      jsonResponse,
+      'casillas-generadas'
+    )
   }
+
+    // Función para convertir los votos en atributos dinámicos de CasillaResult
+  convertirVotosACasillaResult(casilla: CasillaResult): {[key: string]: any} { //-1: sin dato, -2: sin acta, -3: ilegible
+    let votos = casilla.votos
+
+    const mapeoBoletas: { [key: number]: string } = {
+      '-1': 'SIN DATO',
+      '-2': 'SIN ACTA',
+      '-3': 'ILEGIBLE'
+    };
+
+    const casillaJSON: { [key: string]: any } = { ...casilla };
+    if(!(casilla.contabiliza == 1)) {
+      casillaJSON['boletas'] = mapeoBoletas[casilla.boletas]
+      casillaJSON['listaNominal'] = mapeoBoletas[casilla.listaNominal]
+      casillaJSON['boletasSobrantes'] = mapeoBoletas[casilla.boletasSobrantes]
+      casillaJSON['personasQueVotaron'] = mapeoBoletas[casilla.personasQueVotaron]
+      casillaJSON['votosSacadosDeLaUrna'] = mapeoBoletas[casilla.votosSacadosDeLaUrna]
+      casillaJSON['total'] = mapeoBoletas[casilla.total]
+    }
+    // Iterar sobre los votos y asignarlos como atributos de la casilla
+    votos.forEach((voto) => {
+      if(voto.votos < 0) casillaJSON[voto.nombre] = mapeoBoletas[voto.votos]
+      else casillaJSON[voto.nombre] = voto.votos;
+    });
+
+    return casillaJSON;
+  }
+
 
   inicializarValoresArrayCasillas(matriz: number[][], coaliciones: PartidoInterface[]) {
     let porcentaje_sin_contabilizar = Math.ceil(matriz.length * (10 / 100));
     let array_variaciones = this.ordenarVariacionesCeros(porcentaje_sin_contabilizar);
 
     for(let i = 0, countNoContabiliza = 0; i < this.resultArrayCasillas.length; i ++) {
-      if(this.resultArrayCasillas[i].contabiliza) {
+      if(this.resultArrayCasillas[i].contabiliza == 1) {
         for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
           let nodo_voto = this.resultArrayCasillas[i].votos[j]
           if(nodo_voto.votos == -33) {
-            this.resultArrayCasillas[i].votos[j].votos = array_variaciones[countNoContabiliza]
+            let randNoContabiliza: number = ((this.getRandomInt(2) + 1) * -1)
+            console.log(`noContabiliza1: ${countNoContabiliza}, i: ${i}, j: ${j}, rand: ${randNoContabiliza}, condicion: ${(countNoContabiliza > porcentaje_sin_contabilizar)}`)
+            this.resultArrayCasillas[i].votos[j].votos = (countNoContabiliza > porcentaje_sin_contabilizar) ? randNoContabiliza : array_variaciones[countNoContabiliza]
             countNoContabiliza ++;
             // console.log(`index-mal: ${i}, j: ${j}`)
           } else {
@@ -82,7 +137,7 @@ export class AppComponent implements OnInit{
         let votosCoaliciones: NodoVotos[] = []
         for(let n = 0; n < coaliciones.length; n ++) {
           let partidos_de_coalicion = coaliciones[n].siglasPartido.split('_')
-          votosCoaliciones.push({nombre: coaliciones[n].siglasPartido, votos: 0})
+          votosCoaliciones.push({nombre: coaliciones[n].siglasPartido, votos: 0, tipo: 3})
           for(let s = 0; s < partidos_de_coalicion.length; s ++) {
             for(let m = 0; m < this.resultArrayCasillas[i].votos.length; m ++) {
               if(
@@ -97,16 +152,27 @@ export class AppComponent implements OnInit{
           }
         }
         this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
-        if(this.resultArrayCasillas[i].contabiliza) {
+        if(this.resultArrayCasillas[i].contabiliza == 1) {
           this.resultArrayCasillas[i].boletasSobrantes = (this.resultArrayCasillas[i].boletas - this.obtenerSumatoriaTotalPartidosCoaliciones(i))
           this.resultArrayCasillas[i].total = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
           this.resultArrayCasillas[i].personasQueVotaron = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
         }
         // console.log("coaliciones: ", votosCoaliciones, ", normales: ", this.resultArrayCasillas[i].votos)
       } else {
+        this.resultArrayCasillas[i].boletasSobrantes = array_variaciones[countNoContabiliza]
+        this.resultArrayCasillas[i].total = array_variaciones[countNoContabiliza]
+        this.resultArrayCasillas[i].personasQueVotaron = array_variaciones[countNoContabiliza]
+
         for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
           this.resultArrayCasillas[i].votos[j].votos = array_variaciones[countNoContabiliza]
         }
+        let votosCoaliciones: NodoVotos[] = []
+        for(let m = 0; m < coaliciones.length; m ++) {
+          let randNoContabiliza: number = ((this.getRandomInt(2) + 1) * -1)
+          votosCoaliciones.push({ nombre: coaliciones[m].siglasPartido, votos: (countNoContabiliza > porcentaje_sin_contabilizar) ? array_variaciones[countNoContabiliza] : randNoContabiliza, tipo: 3 })
+          console.log(`noContabiliza3: ${countNoContabiliza}, i: ${i}`)
+        }
+        this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
         countNoContabiliza ++
       }
     }
@@ -171,7 +237,7 @@ export class AppComponent implements OnInit{
     let matrizFinal: number[][] = []
     //************** CALCULAR MATRIZ FINAL ****************/
     for(let i = 0; i < this.casillasArray.length; i ++) {
-      if(this.resultArrayCasillas[i].contabiliza) {
+      if(this.resultArrayCasillas[i].contabiliza == 1) {
         let i_array: number[] = []
         let _votos = this.resultArrayCasillas[i].votos;
         // i_array.push(...matrizAjustada[i])
@@ -237,7 +303,7 @@ export class AppComponent implements OnInit{
     }
 
     acum = 0;
-    for(let i = 1; i < _matrizFinal[0].length; i ++) {// se hace conteo columnas despues de hacer ajuste en sumatorias
+    for(let i = 1; i < _matrizFinal[0].length; i ++) { // se hace conteo columnas despues de hacer ajuste en sumatorias
         for(let j = 0; j < _matrizFinal.length; j ++)
             if(_matrizFinal[j][i] != -1 && _matrizFinal[j][i] != -33) acum += (_matrizFinal[j][i])
         if(i > 0) {
@@ -248,26 +314,6 @@ export class AppComponent implements OnInit{
     }
     console.log(_acumArray)
     return _matrizFinal
-  }
-
-  //votos: arreglo de votos, sumaObjetivo:
-  generarRandArray(partidos: NodoVotos[], sumaObjetivo: number): number[] {
-    let array: number[] = []
-    let returnVotos: number[] = []
-    for(let i = 0; i < partidos.length; i ++) {
-      if(partidos[i].votos !== -1 && partidos[i].votos !== -33) {
-        let rand: number
-        if(i === 0){
-          rand = this.getRandomInt(14);
-        } else {
-          rand = this.getRandomInt(this.diferenciaSA(returnVotos, sumaObjetivo));
-        }
-        returnVotos.push(rand)
-      } else {
-        returnVotos.push(partidos[i].votos)
-      }
-    }
-    return returnVotos
   }
 
   generarMatrizCalculada(filas: number, columnas: number, sumatoriaColumna: number): number[][] {
@@ -282,7 +328,7 @@ export class AppComponent implements OnInit{
                 valorAleatorio = Math.floor(Math.random() * 15);
             } else {
                 // Generar un número entero aleatorio no negativo para las otras columnas
-                valorAleatorio = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+                valorAleatorio = Math.floor(Math.random() * 10);
             }
             matriz[i][j] = valorAleatorio;
         }
@@ -380,19 +426,7 @@ export class AppComponent implements OnInit{
       }
     }
 
-    // countOver = 0, filas = retMatriz.length
-    // for(let i = 0; i < filas; i ++) {
-    //   let sum = this.getSumColumns(retMatriz, i)
-    //   if(sum > this.casillasArray[i].boletas) {
-    //     countOver += 1
-        // console.log("******************ajustada-i: ", i, ", valores: ", retMatriz[i])
-        // console.log("*************ajustada-i: ", sum, ", boletas:", this.casillasArray[i].boletas)
-    //   }
-    // }
-    // console.log("----------over: ", countOver)
-
     for(let x = 0; x < retMatriz.length; x ++) {
-      // console.log(`i: ${x}, sum: ${this.getSumColumns(retMatriz[x])}, boletas: ${this.casillasArray[x].boletas}`)
       _matriz.push([...retMatriz[x]])
     }
 
@@ -451,8 +485,8 @@ export class AppComponent implements OnInit{
         votosSacadosDeLaUrna: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
         votos: arrayNodos,
         total: (cerosArray[i] !== -1) ? 0 : cerosArray[i],
-        contabiliza: (cerosArray[i] !== -1) ? true : false,
-        urna_electronica: false
+        contabiliza: (cerosArray[i] !== -1) ? 1 : 0,
+        urna_electronica: 0
       }
       casillaResultArray.push(item)
     }
@@ -464,32 +498,28 @@ export class AppComponent implements OnInit{
     let randIndex = this.getRandomInt((partidosArray.length + 1))
 
     if(esContable === -33 && randIndex === partidosArray.length) {
-      arrayNodos.push({ nombre: "representantesQueVotaron", votos: esContable })
+      arrayNodos.push({ nombre: "representantesQueVotaron", votos: esContable, tipo: 1 })
       // console.log("idCasillaPREP: ", idCasillaPREP)
     }else {
-      arrayNodos.push({ nombre: "representantesQueVotaron", votos: 0 })
+      arrayNodos.push({ nombre: "representantesQueVotaron", votos: 0, tipo: 1 })
     }
     for(let j = 0; j < partidosArray.length; j ++) {
-      if(esContable === -33 && randIndex === j){
-        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable })
-        // console.log("idCasillaPREP: ", idCasillaPREP)
-      }else{
-        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: 0 })
+      if(esContable === -33 && randIndex === j) {
+        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable, tipo: 2 })
+      } else {
+        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: 0, tipo: 2 })
       }
     }
-
-  // representantesQueVotaron: number;
+    // representantesQueVotaron: number;
     if(esContable === -33 && randIndex === partidosArray.length) {
-      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: esContable })
-      // console.log("idCasillaPREP: ", idCasillaPREP)
-    }else {
-      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: 0 })
+      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: esContable, tipo: 1 })
+    } else {
+      arrayNodos.push({ nombre: "candidatosNoRegistrados", votos: 0, tipo: 1 })
     }
     if(esContable === -33 && randIndex === partidosArray.length + 1) {
-      arrayNodos.push({ nombre: "votosNulos", votos: esContable })
-      // console.log("idCasillaPREP: ", idCasillaPREP)
-    }else {
-      arrayNodos.push({ nombre: "votosNulos", votos: 0 })
+      arrayNodos.push({ nombre: "votosNulos", votos: esContable, tipo: 1 })
+    } else {
+      arrayNodos.push({ nombre: "votosNulos", votos: 0, tipo: 1 })
     }
     return arrayNodos
   }
