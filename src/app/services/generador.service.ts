@@ -69,7 +69,7 @@ export class GeneradorService {
           let nodo_voto = this.resultArrayCasillas[i].votos[j]
           if(nodo_voto.votos == -33) {
             let randNoContabiliza: number = ((this.getRandomInt(2) + 1) * -1)
-            if(countNoContabiliza > porcentaje_sin_contabilizar) console.log(`noContabiliza1: ${countNoContabiliza}, i: ${i}, j: ${j}, rand: ${randNoContabiliza}, val: ${array_variaciones[countNoContabiliza]}, condicion: ${(countNoContabiliza > porcentaje_sin_contabilizar)}`)
+            // if(countNoContabiliza > porcentaje_sin_contabilizar) console.log(`noContabiliza1: ${countNoContabiliza}, i: ${i}, j: ${j}, rand: ${randNoContabiliza}, val: ${array_variaciones[countNoContabiliza]}, condicion: ${(countNoContabiliza > porcentaje_sin_contabilizar)}`)
             this.resultArrayCasillas[i].votos[j].votos = (countNoContabiliza > porcentaje_sin_contabilizar) ? randNoContabiliza : array_variaciones[countNoContabiliza]
             countNoContabiliza ++;
             // console.log(`index-mal: ${i}, j: ${j}`)
@@ -106,7 +106,7 @@ export class GeneradorService {
       } else {
         let randNoContabiliza: number = ((this.getRandomInt(2) + 1) * -1)
         let validaNoContabilizaIndex = (countNoContabiliza > porcentaje_sin_contabilizar || array_variaciones[countNoContabiliza] == undefined)
-        if(validaNoContabilizaIndex) console.log("******* se pasoooooo-i: ", i)
+        // if(validaNoContabilizaIndex) console.log("******* se pasoooooo-i: ", i)
 
         this.resultArrayCasillas[i].boletasSobrantes = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
         this.resultArrayCasillas[i].total = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
