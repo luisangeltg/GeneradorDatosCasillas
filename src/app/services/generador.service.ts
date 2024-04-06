@@ -99,13 +99,16 @@ export class GeneradorService {
         if(this.resultArrayCasillas[i].contabiliza == 1) {
           this.resultArrayCasillas[i].boletasSobrantes = (this.resultArrayCasillas[i].boletas - this.obtenerSumatoriaTotalPartidosCoaliciones(i))
           this.resultArrayCasillas[i].total = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
-          this.resultArrayCasillas[i].personasQueVotaron = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
+          this.resultArrayCasillas[i].personasQueVotaron = this.obtenerSumatoriaTotalPartidosCoaliciones(i) - this.resultArrayCasillas[i].votos[0].votos
+          this.resultArrayCasillas[i].votosSacadosDeLaUrna = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
         }
         // console.log("coaliciones: ", votosCoaliciones, ", normales: ", this.resultArrayCasillas[i].votos)
       } else {
         this.resultArrayCasillas[i].boletasSobrantes = array_variaciones[countNoContabiliza]
         this.resultArrayCasillas[i].total = array_variaciones[countNoContabiliza]
         this.resultArrayCasillas[i].personasQueVotaron = array_variaciones[countNoContabiliza]
+        this.resultArrayCasillas[i].listaNominal = array_variaciones[countNoContabiliza]
+        this.resultArrayCasillas[i].boletas = array_variaciones[countNoContabiliza]
 
         for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
           this.resultArrayCasillas[i].votos[j].votos = array_variaciones[countNoContabiliza]

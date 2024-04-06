@@ -10,7 +10,10 @@ import { GeneradorService } from './services/generador.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit{
-  constructor(private services: ServicesClass, private excelService: ExcelService, private generadorService: GeneradorService){ }
+  constructor(private services: ServicesClass, private excelService: ExcelService, private generadorService: GeneradorService){
+
+
+  }
   title = 'DistribucionVotos';
   casillasArray!: CasillaInterface[];
   partidosArray!: PartidoInterface[];
@@ -21,8 +24,9 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.services.getCATD().subscribe((response) => {
-      this.selected_CATD = 'Todos'
       this.catdArray = response.CatdResponse;
+      this.selected_CATD = 'Todos'
+      this.changeSelect()
     });
     this.services.getPartidos().subscribe((response) => {
       this.partidosArray = response.PartidosResponse
@@ -49,6 +53,8 @@ export class AppComponent implements OnInit{
     console.log("totalBoletas: ", totalBoletas)
     // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.generadorService.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generadorService.generaNoContabilizaArray(this.casillasArray.length));
+    this.generadorService.initResults(this.resultArrayCasillas);
+
     console.log("result array: ", this.resultArrayCasillas);
     //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
     let matriz = this.generadorService.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
@@ -76,24 +82,31 @@ export class AppComponent implements OnInit{
     console.log("jsonResponse: ", jsonResponse)
 
 
-    // this.excelService.exportToExcel(
-    //   jsonResponse,
-    //   'casillas-generadas'
-    // )
+    this.excelService.exportToExcel(
+      jsonResponse,
+      this.selected_CATD + " - CASILLAS"
+    )
   }
 
   changeSelect() {
+    console.log("selected_catd: ", this.selected_CATD)
     if(this.selected_CATD == 'Todos') {
       this.services.getCasillas().subscribe((response) => {
         this.casillasArray = response.CasillasResponse
+
+        this.generadorService.initCasillas(this.casillasArray)
+        console.log("changeCasillas: ", this.casillasArray)
+        this.generadorService.initResults(this.resultArrayCasillas)
       });
     } else {
       let index = this.catdArray.findIndex((catd) => catd.CATD === this.selected_CATD);
       this.services.getCasillasByCatd(this.catdArray[index].CATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
+
+        this.generadorService.initCasillas(this.casillasArray)
+        console.log("changeCasillas: ", this.casillasArray)
+        this.generadorService.initResults(this.resultArrayCasillas)
       });
-      this.generadorService.initCasillas(this.casillasArray)
-      this.generadorService.initResults(this.resultArrayCasillas)
     }
   }
 }
