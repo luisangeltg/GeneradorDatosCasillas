@@ -25,7 +25,23 @@
       "activo": true
     },
     {
+      "idPartido": 4,
+      "partido": "Partido del Trabajo",
+      "siglasPartido": "PT",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
       "idPartido": 5,
+      "partido": "Partido Verde",
+      "siglasPartido": "PV",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 6,
       "partido": "Movimiento Ciudadano",
       "siglasPartido": "MC",
       "coalicion": false,
@@ -33,26 +49,41 @@
       "activo": true
     },
     {
+      "idPartido": 7,
+      "partido": "MORENA",
+      "siglasPartido": "MORENA",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 8,
+      "partido": "Independiente",
+      "siglasPartido": "Independiente",
+      "coalicion": false,
+      "independiente": true,
+      "activo": true
+    },
+    {
       "idPartido": 29,
-      "partido": "Va por Tamaulipas",
-      "siglasPartido": "PAN_PRI_PRD",
+      "partido": "PAN_PRI",
+      "siglasPartido": "PAN_PRI",
       "coalicion": true,
       "independiente": false,
       "activo": true
     },
     {
       "idPartido": 30,
-      "partido": "PAN_PRI",
-      "siglasPartido": "PAN_PRI",
+      "partido": "PT_VERDE_MORENA",
+      "siglasPartido": "PT_PV_MORENA",
       "coalicion": true,
-      "idPartidoDepende": 29,
       "independiente": false,
       "activo": true
     },
     {
       "idPartido": 31,
-      "partido": "PAN_PRD",
-      "siglasPartido": "PAN_PRD",
+      "partido": "PT_VERDE",
+      "siglasPartido": "PT_PV",
       "coalicion": true,
       "idPartidoDepende": 29,
       "independiente": false,
@@ -60,8 +91,8 @@
     },
     {
       "idPartido": 32,
-      "partido": "PRI_PRD",
-      "siglasPartido": "PRI_PRD",
+      "partido": "PT_MORENA",
+      "siglasPartido": "PT_MORENA",
       "coalicion": true,
       "idPartidoDepende": 29,
       "independiente": false,
@@ -69,9 +100,10 @@
     },
     {
       "idPartido": 33,
-      "partido": "Juntos Hacemos Historia en Tamaulipas",
-      "siglasPartido": "Juntos Hacemos Historia en Tamaulipas",
-      "coalicion": false,
+      "partido": "PV_MORENA",
+      "siglasPartido": "PV_MORENA",
+      "coalicion": true,
+      "idPartidoDepende": 29,
       "independiente": false,
       "activo": true
     }
