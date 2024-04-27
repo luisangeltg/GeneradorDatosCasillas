@@ -43,8 +43,20 @@ export class ServicesClass {
     );
   }
 
-  getCATD(): Observable<CatdResponse> {
-    return this.http.get<CatdResponse>(`${AppSettings.URL_BASE}/catd.json`)
+  getCATD(tipoCATD: number): Observable<CatdResponse> {
+    return this.http.get<CatdResponse>(`${AppSettings.URL_BASE}/catd.json`).pipe(
+      map((response) => {
+        const catds = response.CatdResponse.filter((catd) => {
+          return (
+            (catd.idTipoCATD == tipoCATD)
+          )
+        });
+        return { CatdResponse: catds}
+      }),
+      catchError((error) => {
+        return of({CatdResponse: []})
+      })
+    );
   }
 
   getPartidos(): Observable<PartidosResponse> {

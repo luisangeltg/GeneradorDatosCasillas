@@ -24,11 +24,7 @@ export class AppComponent implements OnInit{
 
 
   ngOnInit(): void {
-    this.services.getCATD().subscribe((response) => {
-      this.catdArray = response.CatdResponse;
-      this.selected_CATD = 'Todos'
-      this.changeSelect()
-    });
+    this.changeTipoCATD()
     this.services.getPartidos().subscribe((response) => {
       this.partidosArray = response.PartidosResponse
     });
@@ -100,7 +96,8 @@ export class AppComponent implements OnInit{
 
   changeSelect() {
     //1: Distrito, 2: Municipio
-    console.log("selected_catd: ", this.selected_CATD)
+    console.log("selected_catd: ", this.selected_CATD, "tipoCATD: ", this.selected_TipoCATD)
+
     if(this.selected_CATD == 'Todos') {
       this.services.getCasillas(this.selected_TipoCATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
@@ -119,5 +116,13 @@ export class AppComponent implements OnInit{
         this.generadorService.initResults(this.resultArrayCasillas)
       });
     }
+  }
+
+  changeTipoCATD() {
+    this.services.getCATD(this.selected_TipoCATD).subscribe((response) => {
+      this.catdArray = response.CatdResponse;
+      this.selected_CATD = 'Todos'
+      this.changeSelect()
+    });
   }
 }

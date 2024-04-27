@@ -79,9 +79,8 @@ export interface CasillaInterface {
   id_Identifica_Acta:           number;
 }
 
-
-
 export interface CatdInterface {
   ID: number,
-  CATD: string
+  CATD: string,
+  idTipoCATD: number
 }
