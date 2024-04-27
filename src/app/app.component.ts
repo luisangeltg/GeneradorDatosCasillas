@@ -20,6 +20,7 @@ export class AppComponent implements OnInit{
   catdArray!: CatdInterface[];
   resultArrayCasillas!: CasillaResult[];
   selected_CATD: string = 'Todos';
+  selected_TipoCATD: number = 1;
 
 
   ngOnInit(): void {
@@ -35,8 +36,17 @@ export class AppComponent implements OnInit{
   }
 
   generarData(): void {
-    const partidos_sin_coalicion = this.partidosArray.filter((partido) => partido.coalicion === false)
-    const coaliciones = this.partidosArray.filter((partido) => partido.coalicion === true)
+    let partidos_sin_coalicion = null
+    let coaliciones
+
+    if(this.selected_CATD == '14 Victoria') {
+      partidos_sin_coalicion = this.partidosArray.filter((partido) => partido.coalicion === false)
+      coaliciones = this.partidosArray.filter((partido) => partido.coalicion === true)
+    } else {
+      partidos_sin_coalicion = this.partidosArray.filter((partido) => partido.coalicion === false && partido.independiente == false)
+      coaliciones = this.partidosArray.filter((partido) => partido.coalicion === true)
+    }
+
 
     let totalBoletas = this.casillasArray.reduce((total, casilla) => {
       return total + casilla.boletas
@@ -89,9 +99,10 @@ export class AppComponent implements OnInit{
   }
 
   changeSelect() {
+    //1: Distrito, 2: Municipio
     console.log("selected_catd: ", this.selected_CATD)
     if(this.selected_CATD == 'Todos') {
-      this.services.getCasillas().subscribe((response) => {
+      this.services.getCasillas(this.selected_TipoCATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
 
         this.generadorService.initCasillas(this.casillasArray)
@@ -100,7 +111,7 @@ export class AppComponent implements OnInit{
       });
     } else {
       let index = this.catdArray.findIndex((catd) => catd.CATD === this.selected_CATD);
-      this.services.getCasillasByCatd(this.catdArray[index].CATD).subscribe((response) => {
+      this.services.getCasillasByCatd(this.selected_TipoCATD, this.catdArray[index].CATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
 
         this.generadorService.initCasillas(this.casillasArray)

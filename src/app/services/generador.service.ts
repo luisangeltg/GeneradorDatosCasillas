@@ -37,7 +37,8 @@ export class GeneradorService {
     const mapeoBoletas: { [key: number]: string } = {
       '-1': 'SIN DATO',
       '-3': 'SIN ACTA',
-      '-2': 'ILEGIBLE'
+      '-2': 'ILEGIBLE',
+      '-4': 'EXCEDE'
     };
 
     const casillaJSON: { [key: string]: any } = { ...casilla };
@@ -134,8 +135,8 @@ export class GeneradorService {
     let sum = this.resultArrayCasillas[i].votos.reduce((total, partido) => {
       let votos = (
           partido.nombre !== 'representantesQueVotaron' &&
-          partido.nombre !== 'candidatosNoRegistrados' &&
-          partido.nombre !== 'votosNulos' &&
+          // partido.nombre !== 'candidatosNoRegistrados' &&
+          // partido.nombre !== 'votosNulos' &&
           partido.votos > 0
         ) ? partido.votos : 0
       return total + (votos)
@@ -147,7 +148,7 @@ export class GeneradorService {
     let array_variaciones: number[] = []
     let val = -1;
     while(size > 0) {
-      if(val == -4)
+      if(val == -5)
         val = -1
       array_variaciones.push(val)
       val--
@@ -271,6 +272,7 @@ export class GeneradorService {
 
   generarMatrizCalculada(filas: number, columnas: number, sumatoriaColumna: number): number[][] {
     let matriz: number[][] = [];
+    console.log(`filas: ${filas}, columnas: ${columnas}, sumaCol: ${sumatoriaColumna}`)
 
     for (let i = 0; i < filas; i++) {
         matriz[i] = [];
@@ -298,6 +300,7 @@ export class GeneradorService {
             fila[j] *= factorEscala
         });
     }
+    console.log(matriz)
     return matriz;
   }
 
@@ -431,7 +434,7 @@ export class GeneradorService {
         distrito: casillasArray[i].Distrito,
         municipio: casillasArray[i].Municipio,
         seccion: Number(casillasArray[i].seccion),
-        casilla: casillasArray[i].claveCasilla,
+        casilla: casillasArray[i].nombreCasilla,
         listaNominal: casillasArray[i].listaNominal,
         boletas: casillasArray[i].boletas,
         boletasSobrantes: (cerosArray[i] !== -1) ? 0 : cerosArray[i],

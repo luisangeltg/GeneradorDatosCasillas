@@ -76,7 +76,10 @@ export interface CasillaInterface {
   CATD:                         string;
   numeroCATD:                   number;
   idTipoCATD:                   number;
+  id_Identifica_Acta:           number;
 }
+
+
 
 export interface CatdInterface {
   ID: number,

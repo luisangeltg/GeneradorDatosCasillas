@@ -19,6 +19,11 @@
         <div>
           <div class="form-group">
             <label for="exampleInputEmail1">Seleccionar CATD: </label>
+
+            <select [(ngModel)]="selected_TipoCATD" (change)="changeSelect()" class="form-select form-select-lg mb-3" aria-label="Large select example">
+              <option value="1" selected>Distrito</option>
+              <option value="2" selected>Ayuntamiento</option>
+            </select>
             <select [(ngModel)]="selected_CATD" (change)="changeSelect()" class="form-select form-select-lg mb-3" aria-label="Large select example">
               <option value="Todos" selected>Todos</option>
               <option *ngFor="let catd of catdArray" [value]="catd.CATD">{{catd.CATD}}</option>

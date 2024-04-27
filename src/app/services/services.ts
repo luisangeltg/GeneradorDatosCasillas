@@ -11,16 +11,28 @@ export class ServicesClass {
 
   constructor(private http: HttpClient) { }
 
-  getCasillas(): Observable<CasillasResponse> {
-    return this.http.get<CasillasResponse>(`${AppSettings.URL_BASE}/casillas.json`);
-  }
-
-  getCasillasByCatd(CATD: string): Observable<CasillasResponse> {
+  getCasillas(tipoCATD: number): Observable<CasillasResponse> {
     return this.http.get<CasillasResponse>(`${AppSettings.URL_BASE}/casillas.json`).pipe(
       map((response) => {
         const casillas = response.CasillasResponse.filter((casilla) => {
           return (
-            (casilla.CATD == CATD)
+            (casilla.idTipoCATD == tipoCATD)
+          )
+        });
+        return { CasillasResponse: casillas }
+      }),
+      catchError((error) => {
+        return of({CasillasResponse: []})
+      })
+    );
+  }
+
+  getCasillasByCatd(tipoCATD: number, CATD: string): Observable<CasillasResponse> {
+    return this.http.get<CasillasResponse>(`${AppSettings.URL_BASE}/casillas.json`).pipe(
+      map((response) => {
+        const casillas = response.CasillasResponse.filter((casilla) => {
+          return (
+            (casilla.CATD == CATD && casilla.idTipoCATD == tipoCATD)
           )
         });
         return { CasillasResponse: casillas }
