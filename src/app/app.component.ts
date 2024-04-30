@@ -57,7 +57,7 @@ export class AppComponent implements OnInit{
     console.log("coaliciones: ", coaliciones)
     console.log("sin coaliciones: ", partidos_sin_coalicion)
     console.log("totalBoletas: ", totalBoletas)
-    // console.log("array de ceros: ", this.generaNoContabilizaArray(this.casillasArray.length));
+    console.log("array de ceros: ", this.generadorService.generaNoContabilizaArray(this.casillasArray.length));
     this.resultArrayCasillas = this.generadorService.initResultArray(this.casillasArray, partidos_sin_coalicion, this.generadorService.generaNoContabilizaArray(this.casillasArray.length));
     this.generadorService.initResults(this.resultArrayCasillas);
 

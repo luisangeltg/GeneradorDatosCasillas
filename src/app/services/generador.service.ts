@@ -35,10 +35,10 @@ export class GeneradorService {
     let votos = casilla.votos
 
     const mapeoBoletas: { [key: number]: string } = {
-      '-1': 'SIN DATO',
-      '-3': 'SIN ACTA',
-      '-2': 'ILEGIBLE',
-      '-4': 'EXCEDE'
+      '-1': 'SIN ACTA',
+      '-2': 'EXCEDE',
+      '-3': 'SIN DATO',
+      '-4': 'ILEGIBLE'
     };
 
     const casillaJSON: { [key: string]: any } = { ...casilla };
@@ -63,17 +63,22 @@ export class GeneradorService {
   inicializarValoresArrayCasillas(matriz: number[][], coaliciones: PartidoInterface[]) {
     let porcentaje_sin_contabilizar = Math.ceil(matriz.length * (10 / 100));
     let array_variaciones = this.ordenarVariacionesCeros(porcentaje_sin_contabilizar);
-    // console.log("array variaciones: ", array_variaciones)
+    console.log("array variaciones: ", array_variaciones)
 
     for(let i = 0, countNoContabiliza = 0; i < this.resultArrayCasillas.length; i ++) {
       if(this.resultArrayCasillas[i].contabiliza == 1) {
         for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
           let nodo_voto = this.resultArrayCasillas[i].votos[j]
           if(nodo_voto.votos == -33) {
-            let randNoContabiliza: number = ((this.getRandomInt(2) ) * -1)
-            if(countNoContabiliza > porcentaje_sin_contabilizar) console.log(`noContabiliza1: ${countNoContabiliza}, i: ${i}, j: ${j}, rand: ${randNoContabiliza}, val: ${array_variaciones[countNoContabiliza]}, condicion: ${(countNoContabiliza > porcentaje_sin_contabilizar)}`)
-            this.resultArrayCasillas[i].votos[j].votos = (countNoContabiliza > porcentaje_sin_contabilizar) ? randNoContabiliza : array_variaciones[countNoContabiliza]
+            let randNoContabiliza: number = ((this.getRandomInt(3,4) ) * -1) //este random sirve para asignar cuando el random va en un solo indice
+            let variacionIndex = array_variaciones.findIndex((val) => val < -2)
+            if(variacionIndex != -1) console.log(`i: ${variacionIndex}, val: ${array_variaciones[variacionIndex]}`)
+
+            // if(variacionIndex != -1) console.log(`noContabiliza1: ${countNoContabiliza}, i: ${i}, j: ${j}, rand: ${randNoContabiliza}, val: ${array_variaciones[variacionIndex]}, condicion: ${(variacionIndex != -1)}`)
+            this.resultArrayCasillas[i].votos[j].votos = (variacionIndex != -1) ? randNoContabiliza : array_variaciones[variacionIndex]
+            console.log(`evaluacion: ${(variacionIndex != -1 || array_variaciones[variacionIndex] == -1)}, valor: ${array_variaciones[variacionIndex]}, rand: ${randNoContabiliza}`)
             countNoContabiliza ++;
+            array_variaciones.splice(variacionIndex, 1)
             console.log(`index-mal: ${i}, j: ${j}`)
           } else {
             this.resultArrayCasillas[i].votos[j].votos = matriz[i][j]
@@ -106,27 +111,32 @@ export class GeneradorService {
         }
         // console.log("coaliciones: ", votosCoaliciones, ", normales: ", this.resultArrayCasillas[i].votos)
       } else {
-        let randNoContabiliza: number = ((this.getRandomInt(2) + 1) * -1)
-        let validaNoContabilizaIndex = (countNoContabiliza > porcentaje_sin_contabilizar || array_variaciones[countNoContabiliza] == undefined)
-        // if(validaNoContabilizaIndex) console.log("******* se pasoooooo-i: ", i)
+        let randNoContabiliza: number = ((this.getRandomInt(1,3)) * -1) //este random sirve para asignar en una fila entera
+        let variacionIndex = array_variaciones.findIndex((val) => val >= -2)
+        let validaNoContabilizaIndex = (variacionIndex != -1 || array_variaciones[variacionIndex] == undefined || array_variaciones[variacionIndex] == -1)
+        // if(validaNoContabilizaIndex) { console.log("******* se pasoooooo-i: ", i)
+        //   console.log(`evaluacion: ${validaNoContabilizaIndex}, valor: ${array_variaciones[countNoContabiliza]}, rand: ${randNoContabiliza}`)
+        // }
 
-        this.resultArrayCasillas[i].boletasSobrantes = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
-        this.resultArrayCasillas[i].total = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
-        this.resultArrayCasillas[i].personasQueVotaron = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
-        this.resultArrayCasillas[i].listaNominal = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
-        this.resultArrayCasillas[i].boletas = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
-        this.resultArrayCasillas[i].votosSacadosDeLaUrna = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
+
+        this.resultArrayCasillas[i].boletasSobrantes = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
+        this.resultArrayCasillas[i].total = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
+        this.resultArrayCasillas[i].personasQueVotaron = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
+        this.resultArrayCasillas[i].listaNominal = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
+        this.resultArrayCasillas[i].boletas = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
+        this.resultArrayCasillas[i].votosSacadosDeLaUrna = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
 
         for(let j = 0; j < this.resultArrayCasillas[i].votos.length; j ++) {
-          this.resultArrayCasillas[i].votos[j].votos = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza]
+          this.resultArrayCasillas[i].votos[j].votos = (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex]
         }
         let votosCoaliciones: NodoVotos[] = []
         for(let m = 0; m < coaliciones.length; m ++) {
-          votosCoaliciones.push({ nombre: coaliciones[m].siglasPartido, votos: (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[countNoContabiliza], tipo: 3 })
+          votosCoaliciones.push({ nombre: coaliciones[m].siglasPartido, votos: (validaNoContabilizaIndex) ? randNoContabiliza : array_variaciones[variacionIndex], tipo: 3 })
           // console.log(`noContabiliza3: ${countNoContabiliza}, i: ${i}`)
         }
         this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
         countNoContabiliza ++
+        array_variaciones.splice(variacionIndex, 1)
       }
     }
   }
@@ -217,6 +227,7 @@ export class GeneradorService {
         if(i > 0) acumColumna += acum;
         acum = 0;
     }
+
     acumColumna = Math.floor(acumColumna/(matrizAjustada[0].length - 1));
     let acumArray: number[] = [];
 
@@ -240,7 +251,7 @@ export class GeneradorService {
           let rand = 0
           let mat_value = _matrizFinal[i][k]
           if(mat_value !== -1 && mat_value !== -33) {
-            rand = this.getRandomInt(_acumArray[j])
+            rand = this.getRandomInt(0,_acumArray[j])
             if(rand == 0 && _acumArray[j] == 1)
               rand = 1
           }
@@ -251,6 +262,7 @@ export class GeneradorService {
             ) {
               _matrizFinal[i][k] = _matrizFinal[i][k] - (rand)
               _acumArray[j] = (_acumArray[j] - (rand))
+              console.log(`acumArray: ${_acumArray[j]}`)
           }
         }
       }
@@ -450,9 +462,10 @@ export class GeneradorService {
     return casillaResultArray
   }
 
-  generarNodosArray(esContable: number, partidosArray: PartidoInterface[], idCasillaPREP: number): NodoVotos[] {
+  generarNodosArray(esContable: number, partidosArray: PartidoInterface[], idCasillaPREP: number): NodoVotos[] {//aqui no se
     let arrayNodos: NodoVotos[] = []
-    let randIndex = this.getRandomInt((partidosArray.length + 1))
+    let randIndex = this.getRandomInt(0, (partidosArray.length + 1))
+    console.log("@@@@@@@rnad: ", randIndex, "cont: ", esContable)
 
     if(esContable === -33 && randIndex === partidosArray.length) {
       arrayNodos.push({ nombre: "representantesQueVotaron", votos: esContable, tipo: 1 })
@@ -481,9 +494,10 @@ export class GeneradorService {
     return arrayNodos
   }
 
-  getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-  }
+  getRandomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 
   generaNoContabilizaArray(size: number): number[] {
     let porcentaje_sin_contabilizar = size * (10 / 100);
