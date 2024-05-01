@@ -59,7 +59,7 @@ export class ServicesClass {
     );
   }
 
-  getPartidos(): Observable<PartidosResponse> {
-    return this.http.get<PartidosResponse>(`${AppSettings.URL_BASE}/partidos.json`);
+  getPartidos(version: number): Observable<PartidosResponse> {
+    return this.http.get<PartidosResponse>(`${AppSettings.URL_BASE}/partidos_v${version}.json`);
   }
 }

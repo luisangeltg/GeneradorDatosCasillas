@@ -42,26 +42,10 @@
     },
     {
       "idPartido": 6,
-      "partido": "Movimiento Ciudadano",
-      "siglasPartido": "MC",
-      "coalicion": false,
-      "independiente": false,
-      "activo": true
-    },
-    {
-      "idPartido": 7,
       "partido": "MORENA",
       "siglasPartido": "MORENA",
       "coalicion": false,
       "independiente": false,
-      "activo": true
-    },
-    {
-      "idPartido": 8,
-      "partido": "Independiente",
-      "siglasPartido": "Independiente",
-      "coalicion": false,
-      "independiente": true,
       "activo": true
     },
     {

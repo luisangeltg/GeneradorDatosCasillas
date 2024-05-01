@@ -59,7 +59,6 @@ export class GeneradorService {
     return casillaJSON;
   }
 
-
   inicializarValoresArrayCasillas(matriz: number[][], coaliciones: PartidoInterface[]) {
     let porcentaje_sin_contabilizar = Math.ceil(matriz.length * (10 / 100));
     let array_variaciones = this.ordenarVariacionesCeros(porcentaje_sin_contabilizar);
@@ -84,7 +83,6 @@ export class GeneradorService {
             this.resultArrayCasillas[i].votos[j].votos = matriz[i][j]
           }
         }
-        // let votosCoaliciones: PartidoInterface[] = []
         let votosCoaliciones: NodoVotos[] = []
         for(let n = 0; n < coaliciones.length; n ++) {
           let partidos_de_coalicion = coaliciones[n].siglasPartido.split('_')
@@ -475,9 +473,9 @@ export class GeneradorService {
     }
     for(let j = 0; j < partidosArray.length; j ++) {
       if(esContable === -33 && randIndex === j) {
-        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: esContable, tipo: 2 })
+        arrayNodos.push({ nombre: partidosArray[j].partido, votos: esContable, tipo: 2 })
       } else {
-        arrayNodos.push({ nombre: partidosArray[j].siglasPartido, votos: 0, tipo: 2 })
+        arrayNodos.push({ nombre: partidosArray[j].partido, votos: 0, tipo: 2 })
       }
     }
     // representantesQueVotaron: number;

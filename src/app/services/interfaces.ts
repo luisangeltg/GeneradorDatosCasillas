@@ -82,5 +82,6 @@ export interface CasillaInterface {
 export interface CatdInterface {
   ID: number,
   CATD: string,
-  idTipoCATD: number
+  idTipoCATD: number,
+  version: number
 }

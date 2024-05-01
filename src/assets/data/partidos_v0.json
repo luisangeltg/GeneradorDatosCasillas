@@ -1,0 +1,103 @@
+{
+  "PartidosResponse": [
+    {
+      "idPartido": 1,
+      "partido": "Partido Acción Nacional",
+      "siglasPartido": "PAN",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 2,
+      "partido": "Partido Revolucionario Institucional",
+      "siglasPartido": "PRI",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 3,
+      "partido": "Partido de la Revolución Democrática",
+      "siglasPartido": "PRD",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 4,
+      "partido": "Partido del Trabajo",
+      "siglasPartido": "PT",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 5,
+      "partido": "Partido Verde",
+      "siglasPartido": "PV",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 6,
+      "partido": "Movimiento Ciudadano",
+      "siglasPartido": "MC",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 7,
+      "partido": "MORENA",
+      "siglasPartido": "MORENA",
+      "coalicion": false,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 29,
+      "partido": "PAN_PRI",
+      "siglasPartido": "PAN_PRI",
+      "coalicion": true,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 30,
+      "partido": "PT_VERDE_MORENA",
+      "siglasPartido": "PT_PV_MORENA",
+      "coalicion": true,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 31,
+      "partido": "PT_VERDE",
+      "siglasPartido": "PT_PV",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 32,
+      "partido": "PT_MORENA",
+      "siglasPartido": "PT_MORENA",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    },
+    {
+      "idPartido": 33,
+      "partido": "PV_MORENA",
+      "siglasPartido": "PV_MORENA",
+      "coalicion": true,
+      "idPartidoDepende": 29,
+      "independiente": false,
+      "activo": true
+    }
+  ]
+}

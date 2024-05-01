@@ -21,13 +21,11 @@ export class AppComponent implements OnInit{
   resultArrayCasillas!: CasillaResult[];
   selected_CATD: string = 'Todos';
   selected_TipoCATD: number = 1;
+  selected_CatdVersion: number = 0;
 
 
   ngOnInit(): void {
     this.changeTipoCATD()
-    this.services.getPartidos().subscribe((response) => {
-      this.partidosArray = response.PartidosResponse
-    });
 
   }
 
@@ -69,7 +67,7 @@ export class AppComponent implements OnInit{
     this.generadorService.inicializarValoresArrayCasillas(matrizFinal, coaliciones);
     console.log("Print result array: ", this.resultArrayCasillas);
 
-    for(let i = 0; i < columnas + coaliciones.length; i ++) {
+    for(let i = 0; i < columnas; i ++) {
       let acum = 0
       for(let j = 0; j < this.resultArrayCasillas.length; j ++) {
         if(
@@ -99,6 +97,12 @@ export class AppComponent implements OnInit{
     console.log("selected_catd: ", this.selected_CATD, "tipoCATD: ", this.selected_TipoCATD)
 
     if(this.selected_CATD == 'Todos') {
+      //obtiene partidos y coaliciones
+      this.services.getPartidos(this.selected_CatdVersion).subscribe((response) => {
+        this.partidosArray = response.PartidosResponse
+      });
+
+      //obtiene casillas
       this.services.getCasillas(this.selected_TipoCATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
 
@@ -108,6 +112,13 @@ export class AppComponent implements OnInit{
       });
     } else {
       let index = this.catdArray.findIndex((catd) => catd.CATD === this.selected_CATD);
+
+      //obtiene partidos
+      this.selected_CatdVersion = this.catdArray[index].version
+      this.services.getPartidos(this.selected_CatdVersion).subscribe((response) => {
+        this.partidosArray = response.PartidosResponse
+      });
+      //obtiene casillas
       this.services.getCasillasByCatd(this.selected_TipoCATD, this.catdArray[index].CATD).subscribe((response) => {
         this.casillasArray = response.CasillasResponse
 
