@@ -220,8 +220,11 @@ export class GeneradorService {
     //total columnas
     let acumColumna = 0, acum = 0;
     for(let i = 0; i < matrizAjustada[0].length; i ++) {
-        for(let j = 0; j < matrizAjustada.length; j ++)
-            if(matrizFinal[i][j] != -1 && matrizFinal[i][j] != -33) acum += Math.floor(matrizFinal[j][i])
+        for(let j = 0; j < matrizAjustada.length; j ++) {
+          if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) {
+            acum += Math.floor(matrizFinal[j][i])
+          }
+        }
         if(i > 0) acumColumna += acum;
         acum = 0;
     }
