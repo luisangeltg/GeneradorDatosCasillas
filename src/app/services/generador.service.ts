@@ -83,24 +83,28 @@ export class GeneradorService {
             this.resultArrayCasillas[i].votos[j].votos = matriz[i][j]
           }
         }
-        let votosCoaliciones: NodoVotos[] = []
-        for(let n = 0; n < coaliciones.length; n ++) {
-          let partidos_de_coalicion = coaliciones[n].siglasPartido.split('_')
-          votosCoaliciones.push({nombre: coaliciones[n].siglasPartido, votos: 0, tipo: 3})
-          for(let s = 0; s < partidos_de_coalicion.length; s ++) {
-            for(let m = 0; m < this.resultArrayCasillas[i].votos.length; m ++) {
-              if(
-                partidos_de_coalicion[s] == this.resultArrayCasillas[i].votos[m].nombre &&
-                this.resultArrayCasillas[i].votos[m].votos > 0
-              ) {
-                votosCoaliciones[n].votos += this.resultArrayCasillas[i].votos[m].votos
-              }
-            }
-            // let index = this.resultArrayCasillas[i].votos.findIndex(voto => voto.nombre === partidos_de_coalicion[k])
-            // this.resultArrayCasillas[i].votos[index].votos
-          }
-        }
-        this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
+
+
+        // let votosCoaliciones: NodoVotos[] = []
+        // for(let n = 0; n < coaliciones.length; n ++) {
+        //   let partidos_de_coalicion = coaliciones[n].siglasPartido.split('_')
+        //   votosCoaliciones.push({nombre: coaliciones[n].siglasPartido, votos: 0, tipo: 3})
+        //   for(let s = 0; s < partidos_de_coalicion.length; s ++) {
+        //     for(let m = 0; m < this.resultArrayCasillas[i].votos.length; m ++) {
+        //       if(
+        //         partidos_de_coalicion[s] == this.resultArrayCasillas[i].votos[m].nombre &&
+        //         this.resultArrayCasillas[i].votos[m].votos > 0
+        //       ) {
+        //         votosCoaliciones[n].votos += this.resultArrayCasillas[i].votos[m].votos
+        //       }
+        //     }
+        //     // let index = this.resultArrayCasillas[i].votos.findIndex(voto => voto.nombre === partidos_de_coalicion[k])
+        //     // this.resultArrayCasillas[i].votos[index].votos
+        //   }
+        // }
+        // this.resultArrayCasillas[i].votos.push(...votosCoaliciones)
+
+
         if(this.resultArrayCasillas[i].contabiliza == 1) {
           this.resultArrayCasillas[i].boletasSobrantes = (this.resultArrayCasillas[i].boletas - this.obtenerSumatoriaTotalPartidosCoaliciones(i))
           this.resultArrayCasillas[i].total = this.obtenerSumatoriaTotalPartidosCoaliciones(i)
@@ -137,6 +141,43 @@ export class GeneradorService {
         array_variaciones.splice(variacionIndex, 1)
       }
     }
+  }
+
+  sumaColumnaMatriz(index: number, matriz: number[][]): number {
+    let acum = 0;
+    console.log(`f: ${matriz.length}, c: ${matriz[0].length}`)
+    for(let i = 0; matriz.length; i ++)
+      if(matriz[i][index] !== -33 && matriz[i][index] !== -1)
+        acum += matriz[i][index]
+
+    return acum
+  }
+
+  ajusteMatrizFinalCoaliciones(matriz: number[][], partidos: PartidoInterface[], coaliciones: PartidoInterface[]): number[][] {
+    let return_matriz: number[][] = []
+    console.log(`final:`, matriz, "partidos:", partidos, "coaliciones: ", coaliciones)
+    for(let i = 0; i < partidos.length; i ++) {
+      let countAparicionesPartido = this.cuentaCoalicionesDeUnPartido(partidos[i].siglasPartido, coaliciones) + 1
+
+      if(countAparicionesPartido - 1 >= 0) {
+        let sumaTotalColumna = this.sumaColumnaMatriz((i + 1), matriz)
+        let diferencia = Math.ceil(sumaTotalColumna/countAparicionesPartido)
+        console.log(`-----------sum: ${sumaTotalColumna}, dif: ${diferencia}`)
+      }
+    }
+
+    this.verificarBoletas(matriz)
+
+
+    return return_matriz
+  }
+
+  cuentaCoalicionesDeUnPartido(partido: string, coaliciones: PartidoInterface[]): number {
+    let acumCount = 0;
+    for(let i = 0; i < coaliciones.length; i ++) {
+      if(coaliciones[i].siglasPartido.includes(partido)) acumCount ++
+    }
+    return acumCount
   }
 
   obtenerSumatoriaTotalPartidosCoaliciones(i: number): number {
@@ -236,12 +277,11 @@ export class GeneradorService {
       for(let j = 0; j < matrizAjustada.length; j ++)
           if(matrizFinal[j][i] != -1 && matrizFinal[j][i] != -33) { acum += (matrizFinal[j][i]); }
       if(i > 0) {
-        acumArray.push(acum-acumColumna)
+        acumArray.push(acum - acumColumna)
         console.log(`col: ${i}, diferencia: ${(acum-acumColumna)}, acum: ${acum}, acumCol: ${acumColumna}`)
       }
       acum = 0;
     }
-    console.log(acumArray)
 
     let _matrizFinal: number[][] = [...matrizFinal]
     let _acumArray: number[] = []
@@ -263,7 +303,6 @@ export class GeneradorService {
             ) {
               _matrizFinal[i][k] = _matrizFinal[i][k] - (rand)
               _acumArray[j] = (_acumArray[j] - (rand))
-              console.log(`acumArray: ${_acumArray[j]}`)
           }
         }
       }

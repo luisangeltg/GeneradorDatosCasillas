@@ -46,12 +46,12 @@ export class AppComponent implements OnInit{
       return total + casilla.boletas
     }, 0);
 
-    totalBoletas *= 0.15
+    totalBoletas *= 0.7
 
     let columnas = (partidos_sin_coalicion.length + 3)
 
     console.log("casillas: ", this.casillasArray)
-    // console.log("partidos: ", this.partidosArray)
+    console.log("partidos: ", this.partidosArray)
     console.log("coaliciones: ", coaliciones)
     console.log("sin coaliciones: ", partidos_sin_coalicion)
     console.log("totalBoletas: ", totalBoletas)
@@ -63,33 +63,35 @@ export class AppComponent implements OnInit{
     //this.generarMatrizCalculada(this.resultArrayCasillas, (totalBoletas/(partidos_sin_coalicion.length + 2)))
     let matriz = this.generadorService.generarMatrizCalculada(this.resultArrayCasillas.length, columnas, (totalBoletas / columnas) )
     let matrizFinal = this.generadorService.ajustarSumatoriaFinalMatriz(matriz)
-    console.log("matriz final: ", matrizFinal)
-    this.generadorService.inicializarValoresArrayCasillas(matrizFinal, coaliciones);
-    console.log("Print result array: ", this.resultArrayCasillas);
+    // console.log("matriz final: ", matrizFinal)
+    let final_with_coaliciones = this.generadorService.ajusteMatrizFinalCoaliciones(matrizFinal, partidos_sin_coalicion, coaliciones)
+    console.log("final_coaliciones: ", final_with_coaliciones)
+    // this.generadorService.inicializarValoresArrayCasillas(matrizFinal, coaliciones);
+    // console.log("Print result array: ", this.resultArrayCasillas);
 
-    for(let i = 0; i < columnas; i ++) {
-      let acum = 0
-      for(let j = 0; j < this.resultArrayCasillas.length; j ++) {
-        if(
-          this.resultArrayCasillas[j].contabiliza == 1 &&
-          this.resultArrayCasillas[j].votos[i].votos > 0
-        ) acum += this.resultArrayCasillas[j].votos[i].votos
-        // else console.log(`****error-val: ${this.resultArrayCasillas[j].votos[i].votos}, j: ${j}, i: ${i}`)
-        // if(this.resultArrayCasillas[j].votos[i].votos < -3) console.log(`partido: ${this.resultArrayCasillas[0].votos[i].nombre}, sum: ${acum}`)
-      }
-    }
-    let jsonResponse = []
-    for(let i = 0; i < this.resultArrayCasillas.length; i ++) {
-      // console.log(`i: ${i}, sobrantes: ${this.resultArrayCasillas[i].boletasSobrantes}, boletas`)
-      jsonResponse.push(this.generadorService.convertirVotosACasillaResult(this.resultArrayCasillas[i]))
-    }
-    console.log("jsonResponse: ", jsonResponse)
+    // for(let i = 0; i < columnas; i ++) {
+    //   let acum = 0
+    //   for(let j = 0; j < this.resultArrayCasillas.length; j ++) {
+    //     if(
+    //       this.resultArrayCasillas[j].contabiliza == 1 &&
+    //       this.resultArrayCasillas[j].votos[i].votos > 0
+    //     ) acum += this.resultArrayCasillas[j].votos[i].votos
+    //     // else console.log(`****error-val: ${this.resultArrayCasillas[j].votos[i].votos}, j: ${j}, i: ${i}`)
+    //     // if(this.resultArrayCasillas[j].votos[i].votos < -3) console.log(`partido: ${this.resultArrayCasillas[0].votos[i].nombre}, sum: ${acum}`)
+    //   }
+    // }
+    // let jsonResponse = []
+    // for(let i = 0; i < this.resultArrayCasillas.length; i ++) {
+    //   // console.log(`i: ${i}, sobrantes: ${this.resultArrayCasillas[i].boletasSobrantes}, boletas`)
+    //   jsonResponse.push(this.generadorService.convertirVotosACasillaResult(this.resultArrayCasillas[i]))
+    // }
+    // console.log("jsonResponse: ", jsonResponse)
 
 
-    this.excelService.exportToExcel(
-      jsonResponse,
-      this.selected_CATD + " - CASILLAS"
-    )
+    // this.excelService.exportToExcel(
+    //   jsonResponse,
+    //   this.selected_CATD + " - CASILLAS"
+    // )
   }
 
   changeSelect() {
@@ -108,6 +110,7 @@ export class AppComponent implements OnInit{
 
         this.generadorService.initCasillas(this.casillasArray)
         console.log("changeCasillas: ", this.casillasArray)
+        console.log("changePartidos: ", this.partidosArray)
         this.generadorService.initResults(this.resultArrayCasillas)
       });
     } else {
@@ -124,6 +127,8 @@ export class AppComponent implements OnInit{
 
         this.generadorService.initCasillas(this.casillasArray)
         console.log("changeCasillas: ", this.casillasArray)
+        console.log("changePartidos: ", this.partidosArray)
+
         this.generadorService.initResults(this.resultArrayCasillas)
       });
     }
